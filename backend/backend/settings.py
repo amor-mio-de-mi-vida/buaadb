@@ -9,12 +9,13 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import pymysql
 
+pymysql.install_as_MySQLdb()
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -25,8 +26,7 @@ SECRET_KEY = "django-insecure-ncb3$^oa1xnab(njnar22d(0fi@%-y8ykpncq^sc6!3mz*u&%v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['0.0.0.0']
 
 # Application definition
 
@@ -69,17 +69,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'USER': 'root',
+        'NAME': 'buaadb', # 用之前要创建一个这个名字的数据库
+        'PASSWORD': '20021023',
+        'OPTIONS': {'charset': 'utf8'}
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'HOST': '120.46.80.149',
+#         'PORT': '3306',
+#         'USER': '21371476',
+#         'NAME': 'buaadb',
+#         'PASSWORD': 'Aa010892',
+#         'OPTIONS': {'charset': 'utf8'}
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -99,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -111,7 +125,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -121,3 +134,13 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# 资源存储路径
+IMAGE_DIR = "./images/"
+FILE_DIR = "./files/"
+
+
+# 资源外部访问路径
+OUT_BASE_PATH = 'http://localhost:8080/'
+IMAGE_PATH = OUT_BASE_PATH + 'images/'
+FILE_PATH = OUT_BASE_PATH + 'files/'
