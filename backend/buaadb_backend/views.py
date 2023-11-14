@@ -1,12 +1,9 @@
-import random
 import time
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth import logout as dj_logout, login as dj_login
 
-from backend import settings
-from .models import *
 from .utils import *
 
 
@@ -17,19 +14,19 @@ def index(request):
 
 def register(request):
     if request.method != "POST":
-        return JsonResponse({"status": 400, "error": 403})  # 非POST请求
+        return JsonResponse({"status": 500})  # 非POST请求
 
     password = request.POST.get('password')
     password_again = request.POST.get('password_again')
     if password_again != password:
-        return JsonResponse({"status": 400, "error": 404})  # 两次密码不一致
+        return JsonResponse({"status": 404})  # 两次密码不一致
 
     id = request.POST.get('id')
     first_name = request.POST.get('name')
     role = request.POSt.get('role')
 
     if exist_id(id):
-        return JsonResponse({"status": 400, "error": 402})  # 学工号重复
+        return JsonResponse({"status": 402})  # 学工号重复
 
     if role == 0:
         Student.objects.create_user(
@@ -56,7 +53,7 @@ def register(request):
         )
         return JsonResponse({"status": 200})
     else:
-        return JsonResponse({"status": 400, "error": 401})  # 无权限注册
+        return JsonResponse({"status": 401})  # 无权限注册
 
 
 def login(request):
@@ -114,9 +111,9 @@ def get_personal_profile(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
-    user_id = request.session.get('username')
+    username = request.session.get('username')
     role = request.session.get('role')
-    res = User.objects.get(username=user_id)
+    res = User.objects.get(username=username)
 
     res_real_name = ""
     res_phone_id = ""
@@ -142,7 +139,7 @@ def get_personal_profile(request):
     return JsonResponse({
         'status': 200,
         'profile': {
-            'user_id': user_id,
+            'user_id': username,
             'name': res.first_name,
             'real_name': res_real_name,
             'phone_id': res_phone_id,
@@ -152,6 +149,58 @@ def get_personal_profile(request):
             'image_id': res_image_id
         }
     })
+
+
+def get_other_profile(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    role = request.session.get('role')
+    username = request.POST.get('username')
+
+    if role == 0:
+        try:
+            user = Manager.objects.get(username=username)
+        except models.ObjectDoesNotExist:
+            user = Student.objects.get(username=username)
+        firstname = user.first_name
+        image_id = user.image_id
+        image = Image.objects.get(ID=image_id)
+        return JsonResponse({
+            "status": 200,
+            "username": username,
+            "name": firstname,
+            "image_url": image.url
+        })
+    elif role == 1 or role == 2:
+        try:
+            user = Manager.objects.get(username=username)
+            firstname = user.first_name
+            image_id = user.image_id
+            image = Image.objects.get(ID=image_id)
+            return JsonResponse({
+                "status": 200,
+                "username": username,
+                "name": firstname,
+                "image_url": image.url
+            })
+        except models.ObjectDoesNotExist:
+            user = Student.objects.get(username=username)
+            image_id = user.image_id
+            image = Image.objects.get(ID=image_id)
+            return JsonResponse({
+                "status": 200,
+                "username": username,
+                "name": user.first_name,
+                "image_url": image.url,
+                "real_name": user.real_name,
+                "phone_id": user.phone_id,
+                "id_number": user.id_number,
+                "wx_id": user.wx_id,
+                "faculty_id": user.faculty_id
+            })
+    else:
+        return JsonResponse({"status": 400})
 
 
 # TODO
@@ -679,7 +728,7 @@ def stu_pub_feedback(request):
 
     for file in files:
         file_id = store_file(file, fn, 1)
-        FeedbackFile.objects.create(file_id=file_id, feedback_id=feedback,post_time=fn)
+        FeedbackFile.objects.create(file_id=file_id, feedback_id=feedback, post_time=fn)
 
 
 def stu_get_feedback(request):
@@ -694,6 +743,7 @@ def stu_get_feedback(request):
     feedbacks = Feedback.objects.filter(student_id=student, project_id=project).values_list('ID', flat=True).all()
 
     return JsonResponse({"status": 200, "feedbacks": feedbacks})
+
 
 def stu_delete_feedback(request):
     if request.method != "POST":
