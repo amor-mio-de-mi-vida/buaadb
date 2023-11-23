@@ -514,9 +514,9 @@ def delete_message(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     id = request.POST.get('id')
-    discussion = Discussion.objects.get(ID=id)
+    message = Message.objects.get(ID=id)
 
-    discussion.delete()
+    message.delete()
 
     return JsonResponse({"status": 200})
 

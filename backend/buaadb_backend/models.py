@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth import settings
 
-
-# Create your models here.
 
 # 学生
 class Student(User):
@@ -52,7 +51,7 @@ class Project(models.Model):
     state = models.CharField(max_length=128, db_column='state')
     quest_url = models.CharField(max_length=1024, db_column='quest_url')
     private = models.BooleanField(db_column='private', default=False)  # 是否团体内私有
-    check = models.BooleanField(db_column='check', default=True)  # 是否在审核中
+    isCheck = models.BooleanField(db_column='isCheck', default=True)  # 是否在审核中
 
     def __str__(self):
         return self.ID
@@ -67,7 +66,7 @@ class Team(models.Model):
     name = models.CharField(max_length=128, db_column='name')
     profile = models.TextField(max_length=4096, db_column='profile')
     image_id = models.CharField(max_length=1024, db_column="image_id")
-    check = models.BooleanField(db_column='check', default=True)  # 是否在审核中
+    isCheck = models.BooleanField(db_column='isCheck', default=True)  # 是否在审核中
 
     def __str__(self):
         return self.ID
@@ -95,7 +94,7 @@ class Discussion(models.Model):
     time = models.CharField(max_length=1024, db_column='time')
     type = models.CharField(max_length=1024, db_column='type')
     title = models.CharField(max_length=1024, db_column='title')
-    author = models.ForeignKey('User', on_delete=models.CASCADE, db_column='author')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='author')
 
     def __str__(self):
         return self.ID
@@ -134,7 +133,7 @@ class Image(models.Model):
 
 class ImageUser(models.Model):
     image_id = models.ForeignKey("Image", on_delete=models.CASCADE, db_column="image_id")
-    user_id = models.ForeignKey("User", on_delete=models.CASCADE, db_column="user_id")
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column="user_id")
 
     class Meta:
         db_table = "image_user"
@@ -178,7 +177,7 @@ class File(models.Model):
 
 class FileUser(models.Model):
     file_id = models.ForeignKey("File", on_delete=models.CASCADE, db_column="file_id")
-    user_id = models.ForeignKey("User", on_delete=models.CASCADE, db_column="user_id")
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column="user_id")
 
     class Meta:
         db_table = "file_user"
@@ -335,8 +334,8 @@ class ProjectManager(models.Model):
 
 
 class ANoticeB(models.Model):
-    sender_id = models.ForeignKey('User', on_delete=models.CASCADE, db_column='sender_id')
-    receiver_id = models.ForeignKey('User', on_delete=models.CASCADE, db_column='receiver_id')
+    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Notice_sender',  on_delete=models.CASCADE, db_column='sender_id')
+    receiver_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Notice_receiver', on_delete=models.CASCADE, db_column='receiver_id')
     notice_id = models.ForeignKey('Notice', on_delete=models.CASCADE, db_column='notice_id')
 
     class Meta:
@@ -344,8 +343,8 @@ class ANoticeB(models.Model):
 
 
 class AMessageB(models.Model):
-    sender_id = models.ForeignKey('User', on_delete=models.CASCADE, db_column='sender_id')
-    receiver_id = models.ForeignKey('User', on_delete=models.CASCADE, db_column='receiver_id')
+    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Message_sender', on_delete=models.CASCADE, db_column='sender_id')
+    receiver_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Message_receiver', on_delete=models.CASCADE, db_column='receiver_id')
     message_id = models.ForeignKey('Message', on_delete=models.CASCADE, db_column='message_id')
 
     class Meta:
