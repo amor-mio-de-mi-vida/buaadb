@@ -109,6 +109,7 @@ def get_personal_profile(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     username = request.session.get('username')
+    print(username)
     role = request.session.get('role')
     res = User.objects.get(username=username)
 
@@ -118,7 +119,7 @@ def get_personal_profile(request):
     res_wx_id = ""
     res_faculty_id = ""
 
-    if role == 0:
+    if role == "0":
         res_stu = Student.objects.get(username=res)
         res_real_name = res_stu.real_name
         res_phone_id = res_stu.phone_id
@@ -126,7 +127,7 @@ def get_personal_profile(request):
         res_wx_id = res_stu.wx_id
         res_faculty_id = res_stu.faculty_id
         res_image_id = res_stu.image_id
-    elif role == 1:
+    elif role == "1":
         res_man = Manager.objects.get(username=res)
         res_image_id = res_man.image_id
     else:
@@ -154,41 +155,47 @@ def get_other_profile(request):
     role = request.session.get('role')
     username = request.POST.get('username')
 
-    if role == 0:
-        try:
+    if role == "0":
+        if get_role(username) == 1:
             user = Manager.objects.get(username=username)
-        except models.ObjectDoesNotExist:
+        else:
             user = Student.objects.get(username=username)
         firstname = user.first_name
-        image_id = user.image_id
-        image = Image.objects.get(ID=image_id)
+        image_id = ""
+        image_url = ""
+        # image_id = user.image_id
+        # image = Image.objects.get(ID=image_id)
         return JsonResponse({
             "status": 200,
             "username": username,
             "name": firstname,
-            "image_url": image.url
+            "image_url": image_url
         })
-    elif role == 1 or role == 2:
-        try:
+    elif role == "1" or role == "2":
+        if get_role(username) == 1:
             user = Manager.objects.get(username=username)
             firstname = user.first_name
-            image_id = user.image_id
-            image = Image.objects.get(ID=image_id)
+            image_id = ""
+            image_url = ""
+            #image_id = user.image_id
+            #image = Image.objects.get(ID=image_id)
             return JsonResponse({
                 "status": 200,
                 "username": username,
                 "name": firstname,
-                "image_url": image.url
+                "image_url": image_url
             })
-        except models.ObjectDoesNotExist:
+        else:
             user = Student.objects.get(username=username)
-            image_id = user.image_id
-            image = Image.objects.get(ID=image_id)
+            image_id = ""
+            image_url = ""
+            #image_id = user.image_id
+            #image = Image.objects.get(ID=image_id)
             return JsonResponse({
                 "status": 200,
                 "username": username,
                 "name": user.first_name,
-                "image_url": image.url,
+                "image_url": image_url,
                 "real_name": user.real_name,
                 "phone_id": user.phone_id,
                 "id_number": user.id_number,
@@ -208,7 +215,7 @@ def modify_personal_profile(request):
     role = request.session.get('role')
     res = User.objects.get(username=user_id)
 
-    if role == 0:
+    if role == "0":
         res_stu = Student.objects.get(username=res)
         res_stu.real_name = request.POST.get("real_name")
         res_stu.phone_id = request.POST.get("phone_id")
@@ -216,22 +223,26 @@ def modify_personal_profile(request):
         res_stu.wx_id = request.POST.get("wx_id")
         res_stu.faculty_id = request.POST.get("faculty_id")
         image = request.FILES.get("image")
-        fn = time.strftime('%Y%m%d%H%M%S')
-        res_stu.image_id = store_file(image, fn, 0)
+        if image is not None:
+            fn = time.strftime('%Y%m%d%H%M%S')
+            res_stu.image_id = store_file(image, fn, 0)
+
         res_stu.save()
         return JsonResponse({"status": 200})
-    elif role == 1:
+    elif role == "1":
         res_man = Manager.objects.get(username=res)
         image = request.FILES.get("image")
-        fn = time.strftime('%Y%m%d%H%M%S')
-        res_man.image_id = store_file(image, fn, 0)
+        if image is not None:
+            fn = time.strftime('%Y%m%d%H%M%S')
+            res_man.image_id = store_file(image, fn, 0)
         res_man.save()
         return JsonResponse({"status": 200})
     else:
         res_admin = Adminstrator.objects.get(username=res)
         image = request.FILES.get("image")
-        fn = time.strftime('%Y%m%d%H%M%S')
-        res_admin.image_id = store_file(image, fn, 0)
+        if image is not None:
+            fn = time.strftime('%Y%m%d%H%M%S')
+            res_admin.image_id = store_file(image, fn, 0)
         res_admin.save()
         return JsonResponse({"status": 200})
 
@@ -241,7 +252,7 @@ def get_teams(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     result = []
-    teams = Team.objects.filter(check=False).all()
+    teams = Team.objects.filter(isCheck=False).all()
 
     for team in teams:
         #image = team.image_id
@@ -262,12 +273,15 @@ def get_team_profile(request):
     team_id = request.POST.get("team_id")
     team = Team.objects.get(ID=team_id)
 
+    image_id = ""
+    image_url = ""
+    image_post_time = ""
     name = team.name
     profile = team.profile
-    image_id = team.image_id
-    image = Image.objects.get(ID=image_id)
-    image_url = image.url
-    image_post_time = image.post_time
+    #image_id = team.image_id
+    #image = Image.objects.get(ID=image_id)
+    #image_url = image.url
+    #image_post_time = image.post_time
     result1 = []
     projects = TeamProject.objects.filter(team_id=team).all()
     for relation in projects:
@@ -282,9 +296,9 @@ def get_team_profile(request):
     students = TeamStudent.objects.filter(team_id=team).all()
     for relation in students:
         student_id = relation.student_id
-        student = Student.objects.get(ID=student_id)
+        student = Student.objects.get(username=student_id)
         result2.append({
-            "name": student.name,
+            "name": student.first_name,
             "id": student.username
         })
 
@@ -292,9 +306,9 @@ def get_team_profile(request):
     managers = TeamManager.objects.filter(team_id=team).all()
     for relation in managers:
         manager_id = relation.manager_id
-        manager = Manager.objects.get(ID=manager_id)
+        manager = Manager.objects.get(username=manager_id)
         result3.append({
-            "name": manager.name,
+            "name": manager.first_name,
             "id": manager.username
         })
 
@@ -810,18 +824,18 @@ def man_create_team(request):
     username = request.session.get('username')
     manager = Manager.objects.get(username=username)
     name = request.POST.get('name')
-    try:
-        Team.objects.get(name=name)
+    if exist_team_name(name):
         return JsonResponse({"status": 400})
-    except models.ObjectDoesNotExist:
+    else:
         profile = request.POST.get('profile')
         image = request.FILES.get('image')
         fn = time.strftime('%Y%m%d%H%M%S')
-        image_id = store_file(image, fn, 0)
-        team = Team.objects.create(name=name, profile=profile, image_id=image_id, check=True)
-        TeamManager.objects.create(team_id=team, manager_id=manager, check=False)  # check为false代表此man自动管理team不用申请
+        if image is not None:
+            image_id = store_file(image, fn, 0)
+        team = Team.objects.create(name=name, profile=profile, isCheck=True)
+        TeamManager.objects.create(team_id=team, manager_id=manager)  # check为false代表此man自动管理team不用申请
 
-        send_notice(time=fn, type='', profile='apply for team', sender_id=username, receiver_id='66666666')
+        send_notice(time=fn, type='', profile='apply for team', sender_id=username, receiver_id='21371479')
         return JsonResponse({"status": 200})
 
 
@@ -955,9 +969,16 @@ def admin_get_apply_team(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
-    teams = Team.objects.filter(check=True).values_list('ID', flat=True)
+    teams = Team.objects.filter(isCheck=True).all()
+    result = []
+    for team in teams:
+        result.append({
+            "name": team.name,
+            "id": team.ID
+            #"time": team.submit_time
+        })
 
-    return JsonResponse({"status": 200, "teams": teams})
+    return JsonResponse({"status": 200, "teams": result})
 
 
 def admin_get_apply_project(request):
@@ -981,19 +1002,21 @@ def admin_check_apply_team(request):
 
     fn = time.strftime('%Y%m%d%H%M%S')
     profile = ""
-    receiver_ids = TeamManager.objects.filter(team_id=team).values_list('manager_id', flat=True).all
+    relations = TeamManager.objects.filter(team_id=team).all()
 
-    if result:
-        team.check = True
+    if result != "0":
+        team.isCheck = False
         team.save()
         type = "success"
-        for receiver_id in receiver_ids:
+        for relation in relations:
+            receiver_id = relation.manager_id.username
             send_notice(fn, type, profile, sender_id, receiver_id)
     else:
         team.delete()
         profile = reason
         type = "fail"
-        for receiver_id in receiver_ids:
+        for relation in relations:
+            receiver_id = relation.manager_id.username
             send_notice(fn, type, profile, sender_id, receiver_id)
 
     return JsonResponse({"status": 200})

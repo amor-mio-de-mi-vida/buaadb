@@ -65,6 +65,7 @@ class Team(models.Model):
     ID = models.AutoField(primary_key=True, db_column='team_id')
     name = models.CharField(max_length=128, db_column='name')
     profile = models.TextField(max_length=4096, db_column='profile')
+    #submit_time = models.CharField(max_length=128, db_column='submit_time') # 提交申请队伍的时间
     image_id = models.CharField(max_length=1024, db_column="image_id")
     isCheck = models.BooleanField(db_column='isCheck', default=True)  # 是否在审核中
 

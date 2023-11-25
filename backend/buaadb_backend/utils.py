@@ -44,6 +44,7 @@ def send_notice(time, type, profile, sender_id, receiver_id):
     notice = Notice.objects.create(time=time, type=type, profile=profile)
     receiver = User.objects.get(username=receiver_id)
     ANoticeB.objects.create(sender_id=sender, receiver_id=receiver, notice_id=notice)
+    print("successfully send notice")
 
 
 def get_notice(username, is_sender):
@@ -71,3 +72,22 @@ def get_notice(username, is_sender):
                 "profile": notice.profile
             })
     return notices
+
+def exist_team_name(name):
+    count = Team.objects.filter(name=name).count()
+
+    if count == 0:
+        return False
+    else:
+        return True
+
+def get_role(username):
+    count = Student.objects.filter(username=username).count()
+    if count != 0:
+        return 0
+    else:
+        count = Manager.objects.filter(username=username).count()
+        if count != 0:
+            return 1
+        else:
+            return 2
