@@ -94,6 +94,7 @@ class Discussion(models.Model):
     time = models.CharField(max_length=1024, db_column='time')
     type = models.CharField(max_length=1024, db_column='type')
     title = models.CharField(max_length=1024, db_column='title')
+    profile = models.TextField(max_length=1024, db_column='profile')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='author')
 
     def __str__(self):

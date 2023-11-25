@@ -48,6 +48,6 @@ urlpatterns = [
     # ---------上面是团体管理员功能--------下面是系统管理员功能------------ #
     path("admin_get_apply_team/", admin_get_apply_team),  # 系统管理员查看待审核团体 # finish
     path("admin_get_apply_project/", admin_get_apply_project),  # 系统管理员审核团体 # finish
-    path("admin_check_apply_team/", admin_check_apply_team),  # 系统管理员查看待审核项目 # finish
+    path("admin_check_apply_team/", admin_check_apply_team),  # 系统管理员处理待审核团体 # finish
     path("admin_check_apply_project/", admin_check_apply_project),  # 系统管理员审核项目 # finish
 ]

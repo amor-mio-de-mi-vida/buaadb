@@ -23,33 +23,30 @@ def register(request):
 
     id = request.POST.get('id')
     first_name = request.POST.get('name')
-    role = request.POSt.get('role')
-
+    role = request.POST.get('role')
+    print(role)
     if exist_id(id):
         return JsonResponse({"status": 402})  # 学工号重复
 
-    if role == 0:
+    if role == "0":
         Student.objects.create_user(
             username=id,
             password=password,
             first_name=first_name,
-            role=0
         )
         return JsonResponse({"status": 200})
-    elif role == 1:
+    elif role == "1":
         Manager.objects.create_user(
             username=id,
             password=password,
             first_name=first_name,
-            role=1
         )
         return JsonResponse({"status": 200})
-    elif role == 2:
+    elif role == "2":
         Adminstrator.objects.create_user(
             username=id,
             password=password,
             first_name=first_name,
-            role=2
         )
         return JsonResponse({"status": 200})
     else:
@@ -63,11 +60,11 @@ def login(request):
     id = request.POST.get('id')
     password = request.POST.get('password')
     role = request.POST.get('role')
-    if role == 0:
+    if role == "0":
         user = Student.objects.filter(username=id).first()
-    elif role == 1:
+    elif role == "1":
         user = Manager.objects.filter(username=id).first()
-    elif role == 2:
+    elif role == "2":
         user = Adminstrator.objects.filter(username=id).first()
     else:
         return JsonResponse({"status": 400})  # 未注册
@@ -138,16 +135,15 @@ def get_personal_profile(request):
 
     return JsonResponse({
         'status': 200,
-        'profile': {
-            'user_id': username,
-            'name': res.first_name,
-            'real_name': res_real_name,
-            'phone_id': res_phone_id,
-            'id_number': res_id_number,
-            'wx_id': res_wx_id,
-            'faculty_id': res_faculty_id,
-            'image_id': res_image_id
-        }
+        'username': username,
+        'name': res.first_name,
+        'real_name': res_real_name,
+        'phone_id': res_phone_id,
+        'id_number': res_id_number,
+        'wx_id': res_wx_id,
+        'faculty_id': res_faculty_id,
+        'image_id': res_image_id,
+        'role': role
     })
 
 
@@ -244,8 +240,19 @@ def get_teams(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
-    teams = list(Team.objects.filter(check=False).values_list('ID', flat=True))
-    return JsonResponse({"status": 200, "teams": teams})
+    result = []
+    teams = Team.objects.filter(check=False).all()
+
+    for team in teams:
+        #image = team.image_id
+        #image_url = Image.objects.get(ID=image).url
+        result.append({
+            "id": team.ID,
+            "name": team.name
+            #"image_url": image_url
+        })
+
+    return JsonResponse({"status": 200, "teams": result})
 
 
 def get_team_profile(request):
@@ -261,9 +268,36 @@ def get_team_profile(request):
     image = Image.objects.get(ID=image_id)
     image_url = image.url
     image_post_time = image.post_time
+    result1 = []
     projects = TeamProject.objects.filter(team_id=team).all()
+    for relation in projects:
+        project_id = relation.project_id
+        project = Project.objects.get(ID=project_id)
+        result1.append({
+            "name": project.name,
+            "id": project.id
+        })
+
+    result2 = []
     students = TeamStudent.objects.filter(team_id=team).all()
+    for relation in students:
+        student_id = relation.student_id
+        student = Student.objects.get(ID=student_id)
+        result2.append({
+            "name": student.name,
+            "id": student.username
+        })
+
+    result3 = []
     managers = TeamManager.objects.filter(team_id=team).all()
+    for relation in managers:
+        manager_id = relation.manager_id
+        manager = Manager.objects.get(ID=manager_id)
+        result3.append({
+            "name": manager.name,
+            "id": manager.username
+        })
+
 
     return JsonResponse({
         "status": 200,
@@ -272,9 +306,9 @@ def get_team_profile(request):
         "image_id": image_id,
         "image_url": image_url,
         "image_post_time": image_post_time,
-        "projects": projects,
-        "students": students,
-        "managers": managers
+        "projects": result1,
+        "students": result2,
+        "managers": result3
     })
 
 
@@ -359,11 +393,19 @@ def get_project(request):
             if project.private:
                 try:
                     ProjectStudent.objects.get(student_id=student, project_id=project)
-                    result.append(project_id)
+                    result.append({
+                        "id": project_id,
+                        "name": project.name,
+                        "time": project.time
+                    })
                 except models.ObjectDoesNotExist:
                     continue
             else:
-                result.append(project_id)
+                result.append({
+                    "id": project_id,
+                    "name": project.name,
+                    "time": project.time
+                })
         return JsonResponse({"status": 200, "projects": result})
     elif role == 1:
         projects = list(Project.objects.filter(check=False).values_list('ID', flat=True))
@@ -390,16 +432,17 @@ def get_project_profile(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
+    role = request.session.get('role')
     project_id = request.POST.get('project_id')
     project = Project.objects.get(ID=project_id)
 
     tags = ProjectTag.objects.filter(project_id=project).all()
     managers = ProjectManager.objects.filter(project_id=project).all()
     students = ProjectStudent.objects.filter(project_id=project).all()
+    team = TeamProject.objects.get(project_id=project_id)
 
     return JsonResponse({
         "status": 200,
-        "project_id": project.ID,
         "name": project.name,
         "time": project.time,
         "place": project.place,
@@ -408,9 +451,11 @@ def get_project_profile(request):
         "quest_url": project.quest_url,
         "check": project.check,
         "private": project.private,
+        "team_name": team.name,
         "tags": tags,
         "managers": managers,
-        "students": students
+        "students": students,
+        "role": role
     })
 
 
@@ -423,9 +468,10 @@ def create_discussion(request):
     type = request.POST.get("type")
     title = request.POST.get("title")
     project_id = request.POST.get('project_id')
+    profile = request.POST.get('profile')
     project = Project.objects.get(ID=project_id)
     user = User.objects.get(username=username)
-    discussion = Discussion.objects.create(time=fn, type=type, title=title, author=user)
+    discussion = Discussion.objects.create(time=fn, type=type, title=title, profile=profile, author=user)
     DiscussionProject.objects.create(discussion_id=discussion, project_id=project)
 
     return JsonResponse({"status": 200})
