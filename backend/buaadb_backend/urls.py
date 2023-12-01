@@ -25,7 +25,8 @@ urlpatterns = [
     path("get_in_team/", get_in_team),  # 查看申请加入团队的学生/管理员 # finish
     path("get_out_team/", get_out_team),  # 查看申请退出团队的学生/管理员 # finish
     path("check_team/", check_team),  # 审核申请团队信息 # finish
-    path("apply_team/", apply_team),  # 申请加入/退出团队 # finish
+    path("apply_team_in/", apply_team_in),  # 申请加入团队 # finish
+    path("apply_team_out", apply_team_out),  # 申请退出团队
     path("get_team_projects/", get_team_projects),  # 获得团队中的项目信息 # finish
     path("get_team_students/", get_team_students),  # 获得团队中的学生信息 # finish
     path("get_team_managers/", get_team_managers),  # 获得团队中的管理者信息 # finish

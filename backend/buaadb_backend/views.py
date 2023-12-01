@@ -90,6 +90,7 @@ def change_password(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     user_id = request.session.get('username')
+    print(user_id)
     user = User.objects.get(username=user_id)
     old_password = request.POST.get('old_password')
     new_password = request.POST.get('new_password')
@@ -333,28 +334,29 @@ def pub_notice(request):
     sender_id = request.session.get('username')
     sender = User.objects.get(username=sender_id)
 
-    receiver_id = request.POST.get("receiver_id")
+    receiver_id = request.POST.get("receiver")
+    print(receiver_id)
     receiver = User.objects.get(username=receiver_id)
     project_id = request.POST.get('project_id')
     project = Project.objects.get(ID=project_id)
     type = request.POST.get("type")
     profile = request.POST.get("text")
-    images = request.FILES.get("images")
-    files = request.FILES.get("files")
+    #images = request.FILES.get("images")
+    #files = request.FILES.get("files")
     fn = time.strftime('%Y%m%d%H%M%S')
     notice = Notice.objects.create(time=fn, type=type, profile=profile)
     ANoticeB.objects.create(sender_id=sender, receiver_id=receiver, notice_id=notice)
     ProjectNotice.objects.create(project_id=project, notice_id=notice)
 
-    for image in images:
-        image_id = store_file(image, fn, 0)
-        # 写数据库
-        ImageNotice.objects.create(image_id=image_id, notice_id=notice)
-
-    for file in files:
-        file_id = store_file(file, fn, 1)
-        # 写数据库
-        FileNotice.objects.create(file_id=file_id, notice_id=notice)
+    # for image in images:
+    #     image_id = store_file(image, fn, 0)
+    #     # 写数据库
+    #     ImageNotice.objects.create(image_id=image_id, notice_id=notice)
+    #
+    # for file in files:
+    #     file_id = store_file(file, fn, 1)
+    #     # 写数据库
+    #     FileNotice.objects.create(file_id=file_id, notice_id=notice)
 
     return JsonResponse({"status": 200})
 
@@ -696,7 +698,7 @@ def check_team(request):
         return JsonResponse({"status": 400})
 
 
-def apply_team(request):
+def apply_team_in(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
@@ -704,15 +706,34 @@ def apply_team(request):
     role = request.session.get('role')
     team_id = request.POST.get('team_id')
     team = Team.objects.get(ID=team_id)
-    status = request.POST.get('status')  # result为False时申请加入,result为True时申请退出
 
-    if role == 0:
+    if role == "0":
         student = Student.objects.get(username=username)
-        StuApplyTeam.objects.create(student_id=student, team_id=team, status=status)
+        StuApplyTeam.objects.create(student_id=student, team_id=team, status=False)
         return JsonResponse({"status": 200})
-    elif role == 1:
+    elif role == "1":
         manager = Manager.objects.get(username=username)
-        ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=status)
+        ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=False)
+        return JsonResponse({"status": 200})
+    else:
+        return JsonResponse({"status": 400})
+
+def apply_team_out(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    username = request.session.get('username')
+    role = request.session.get('role')
+    team_id = request.POST.get('team_id')
+    team = Team.objects.get(ID=team_id)
+
+    if role == "0":
+        student = Student.objects.get(username=username)
+        StuApplyTeam.objects.create(student_id=student, team_id=team, status=True)
+        return JsonResponse({"status": 200})
+    elif role == "1":
+        manager = Manager.objects.get(username=username)
+        ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=True)
         return JsonResponse({"status": 200})
     else:
         return JsonResponse({"status": 400})
@@ -832,10 +853,10 @@ def man_create_team(request):
         fn = time.strftime('%Y%m%d%H%M%S')
         if image is not None:
             image_id = store_file(image, fn, 0)
-        team = Team.objects.create(name=name, profile=profile, isCheck=True)
+        team = Team.objects.create(name=name, profile=profile, isCheck=True, submit_time=fn)
         TeamManager.objects.create(team_id=team, manager_id=manager)  # check为false代表此man自动管理team不用申请
 
-        send_notice(time=fn, type='', profile='apply for team', sender_id=username, receiver_id='21371479')
+        send_notice(time=fn, type='', profile='apply for team', sender_id=username, receiver_id='21371478')
         return JsonResponse({"status": 200})
 
 
@@ -974,8 +995,8 @@ def admin_get_apply_team(request):
     for team in teams:
         result.append({
             "name": team.name,
-            "id": team.ID
-            #"time": team.submit_time
+            "id": team.ID,
+            "time": team.submit_time
         })
 
     return JsonResponse({"status": 200, "teams": result})
