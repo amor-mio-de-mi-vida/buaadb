@@ -20,6 +20,7 @@ urlpatterns = [
     path("delete_notice/", delete_notice),  # 删除通知 # finish
     path("get_send_notice/", get_send_notice),  # 获得已发出的通知 # finish
     path("get_receive_notice_list/", get_receive_notice_list),  # 获得收到的通知 # finish
+    path("get_receive_notice/", get_receive_notice), # 获得特定发送方的notice
     path("pub_message/", pub_message),  # 发布评论 # finish
     path("delete_message/", delete_message),  # 删除评论 # finish
     path("get_in_team/", get_in_team),  # 查看申请加入团队的学生/管理员 # finish
@@ -32,12 +33,15 @@ urlpatterns = [
     path("get_team_managers/", get_team_managers),  # 获得团队中的管理者信息 # finish
     path("get_feedback_profile/", get_feedback_profile),  # 获取feedback的详细信息 # finish
     path("get_other_profile/", get_other_profile),  # 获得他人的信息 #
+    path("get_discussion_replies/", get_discussion_replies), #获得讨论下的回复
     # ---------上面是通用的功能-/--------下面是学生端功能----------------- #
     path("stu_apply_project_in/", stu_apply_project_in),  # 学生申请加入项目 # finish
     path("stu_apply_project_out/", stu_apply_project_out), # 学生申请退出项目 # finish
     path("stu_pub_feedback/", stu_pub_feedback),  # 学生发布项目反馈 # finish
     path("stu_get_feedback/", stu_get_feedback),  # 学生获取已发布的项目反馈 # finish
     path("stu_delete_feedback/", stu_delete_feedback),  # 学生删除反馈 # finish
+    path("stu_get_team/", stu_get_team),
+    path("stu_get_project/", stu_get_project),
     # ---------上面是学生端功能-----------下面是团体管理员功能------------ #
     path("man_create_team/", man_create_team),  # 团队管理员创建团队 # finish
     path("man_modify_team_profile/", man_modify_team_profile),  # 团队管理员修改团队信息 # finish

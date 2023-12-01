@@ -341,18 +341,16 @@ def pub_notice(request):
 
     if type == "0":
         team = Team.objects.get(ID=receiver_id)
-        relations = TeamStudent.objects.filter(team_id=team).all()
-        for relation in relations:
-            student_id = relation.student_id
-    else:
-        project = Project.objects.get(ID=receiver_id)
-        relations = ProjectStudent.objects.filter(project_id=project).all()
+        TeamNotice.objects.create(team_id=team, notice_id=notice)
 
-    #images = request.FILES.get("images")
-    #files = request.FILES.get("files")
-    notice = Notice.objects.create(time=fn, type=type, profile=profile)
-    ANoticeB.objects.create(sender_id=sender, receiver_id=receiver, notice_id=notice)
-    ProjectNotice.objects.create(project_id=project, notice_id=notice)
+    elif type == "1":
+        project = Project.objects.get(ID=receiver_id)
+        ProjectNotice.objects.create(project_id=project, notice_id=notice)
+
+    elif type == "2":
+        receiver = User.objects.get(username=receiver_id)
+        ANoticeB.objects.create(sender_id=sender, receiver_id=receiver, notice_id=notice)
+
 
     # for image in images:
     #     image_id = store_file(image, fn, 0)
@@ -372,11 +370,9 @@ def delete_notice(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     notice_id = request.POST.get("notice_id")
-    try:
-        notice = Notice.objects.get(notice_id)
-        notice.delete()
-    except models.ObjectDoesNotExist:
-        return JsonResponse({"status": 400})  # 不存在此通知
+    notice = Notice.objects.get(ID=notice_id)
+    notice.delete()
+    return JsonResponse({"status":200})
 
 
 def get_send_notice(request):
@@ -393,8 +389,42 @@ def get_receive_notice(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
-    # username = request.session.get('username')
-    # relations = ANoticeB.objects.filter(sender_id=)
+    username = request.session.get('username')
+    receiver = User.objects.get(username=username)
+    type = request.POST.get("type")
+    id = request.POST.get("id")
+
+    notices = []
+
+    if type == "0":
+        team = Team.objects.get(ID=id)
+        relations = TeamNotice.objects.filter(team_id=team).all()
+        for relation in relations:
+            notices.append({
+                "id": relation.notice_id.ID,
+                "time": relation.notice_id.time,
+                "profile": relation.notice_id.profile
+            })
+    elif type == "1":
+        project = Project.objects.get(ID=id)
+        relations = ProjectNotice.objects.filter(project_id=project).all()
+        for relation in relations:
+            notices.append({
+                "id": relation.notice_id.ID,
+                "time": relation.notice_id.time,
+                "profile": relation.notice_id.profile
+            })
+    elif type == "2":
+        sender = User.objects.get(username=id)
+        relations = ANoticeB.objects.filter(sender_id=sender, receiver_id=receiver).all()
+        for relation in relations:
+            notices.append({
+                "id": relation.notice_id.ID,
+                "time": relation.notice_id.time,
+                "profile": relation.notice_id.profile
+            })
+
+    return JsonResponse({"status": 200, "notices": notices})
 
 def get_receive_notice_list(request):
     if request.method != "POST":
@@ -479,9 +509,9 @@ def get_project_profile(request):
     project = Project.objects.get(ID=project_id)
 
     tags = []
-    relations = ProjectTag.objects.filter(project_id=project).all()
-    for relation in relations:
-        tags.append(relation.tag_name)
+    # relations = ProjectTag.objects.filter(project_id=project).all()
+    # for relation in relations:
+    #     tags.append(relation.tag_name)
     managers = []
     relations = ProjectManager.objects.filter(project_id=project).all()
     for relation in relations:
@@ -498,7 +528,7 @@ def get_project_profile(request):
             "username": student.username,
             "name": student.first_name
         })
-    relation = TeamProject.objects.get(project_id=project_id)
+    relation = TeamProject.objects.get(project_id=project)
     team = relation.team_id
 
     return JsonResponse({
@@ -509,7 +539,7 @@ def get_project_profile(request):
         "profile": project.profile,
         "state": project.state,
         "quest_url": project.quest_url,
-        "check": project.check,
+        "check": project.isCheck,
         "private": project.private,
         "team_name": team.name,
         "tags": tags,
@@ -547,6 +577,37 @@ def delete_discussion(request):
 
     return JsonResponse({"status": 200})
 
+def stu_get_team(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    username = request.session.get('username')
+    student = Student.objects.get(username=username)
+    teams = []
+    relations = TeamStudent.objects.filter(student_id=student).all()
+    for relation in relations:
+        teams.append({
+            "id": relation.team_id.ID,
+            "name": relation.team_id.name
+        })
+    return JsonResponse({"status": 200, "teams": teams})
+
+def stu_get_project(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    username = request.session.get('username')
+    student = Student.objects.get(username=username)
+    projects = []
+    relations = ProjectStudent.objects.filter(student_id=student).all()
+    for relation in relations:
+        projects.append({
+            "id": relation.project_id.ID,
+            "name": relation.project_id.name,
+            "time": relation.project_id.time
+        })
+
+    return JsonResponse({"status": 200, "projects": projects})
 
 def get_discussion(request):
     if request.method != "POST":
@@ -555,8 +616,14 @@ def get_discussion(request):
     project_id = request.POST.get("project_id")
     project = Project.objects.get(ID=project_id)
 
-    discussions = DiscussionProject.objects.filter(project_id=project).all()
-
+    discussions = []
+    relations = DiscussionProject.objects.filter(project_id=project).all()
+    for relation in relations:
+        discussions.append({
+            "id": relation.discussion_id.ID,
+            "title": relation.discussion_id.title,
+            "time": relation.discussion_id.time
+        })
     return JsonResponse({"status": 200, "discussions": discussions})
 
 
@@ -594,26 +661,43 @@ def pub_message(request):
     discussion = Discussion.objects.get(ID=discussion_id)
     text = request.POST.get("text")
     fn = time.strftime('%Y%m%d%H%M%S')
-    images = request.FILES.get("images")
-    files = request.FILES.get("files")
+    # images = request.FILES.get("images")
+    # files = request.FILES.get("files")
     message = Message.objects.create(post_time=fn, text=text)
     DiscussionMessage.objects.create(discussion_id=discussion, message_id=message)
     AMessageB(sender_id=sender, receiver_id=receiver, message_id=message)
 
-    for image in images:
-        addr = store_file(image, fn, 0)
-        # 写数据库
-        img = Image.objects.create(url=addr, post_time=fn)
-        ImageMessage.objects.create(image_id=img, message_id=message)
-
-    for file in files:
-        addr = store_file(file, fn, 1)
-        # 写数据库
-        file = File.objects.create(url=addr, post_time=fn)
-        FileMessage.objects.create(file_id=file, message_id=message)
+    # for image in images:
+    #     addr = store_file(image, fn, 0)
+    #     # 写数据库
+    #     img = Image.objects.create(url=addr, post_time=fn)
+    #     ImageMessage.objects.create(image_id=img, message_id=message)
+    #
+    # for file in files:
+    #     addr = store_file(file, fn, 1)
+    #     # 写数据库
+    #     file = File.objects.create(url=addr, post_time=fn)
+    #     FileMessage.objects.create(file_id=file, message_id=message)
 
     return JsonResponse({"status": 200})
 
+def get_discussion_replies(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    discussion_id = request.POST.get("discussion_id")
+    discussion = Discussion.objects.get(ID=discussion_id)
+    relations = DiscussionMessage.objects.filter(discussion_id=discussion_id).all()
+
+    messages = []
+    for relation in relations:
+        messages.append({
+            "id": relation.message_id.ID,
+            "post_time": relation.message_id.post_time,
+            "text": relation.message_id.text
+        })
+
+    return JsonResponse({"status": 200, "messages": messages})
 
 def delete_message(request):
     if request.method != "POST":
@@ -961,7 +1045,7 @@ def man_create_team(request):
         team = Team.objects.create(name=name, profile=profile, isCheck=True, submit_time=fn)
         TeamManager.objects.create(team_id=team, manager_id=manager)  # check为false代表此man自动管理team不用申请
 
-        send_notice(time=fn, type='', profile='apply for team', sender_id=username, receiver_id='21371478')
+        send_notice(time=fn, type='', profile='apply for team', sender_id=username, receiver_id='21371402')
         return JsonResponse({"status": 200})
 
 

@@ -43,7 +43,7 @@ class Adminstrator(User):
 
 # 项目
 class Project(models.Model):
-    ID = models.AutoField(primary_key=True, db_column='class_id')
+    ID = models.AutoField(primary_key=True, db_column='project_id')
     name = models.CharField(max_length=128, db_column='name')
     time = models.CharField(max_length=128, db_column='time')
     place = models.CharField(max_length=128, db_column='place')
@@ -326,6 +326,12 @@ class ProjectNotice(models.Model):
     class Meta:
         db_table = 'project_notice'
 
+class TeamNotice(models.Model):
+    team_id = models.ForeignKey('Team', on_delete=models.CASCADE, db_column='team_id')
+    notice_id = models.ForeignKey('Notice', on_delete=models.CASCADE, db_column='notice_id')
+
+    class Meta:
+        db_table = 'team_notice'
 
 class ProjectManager(models.Model):
     project_id = models.ForeignKey('Project', on_delete=models.CASCADE, db_column='project_id')
