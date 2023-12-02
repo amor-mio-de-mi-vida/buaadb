@@ -947,6 +947,7 @@ def check_team_out(request):
     if role == "1":  # manager获取申请加入team的学生
         student = Student.objects.get(username=receiver_id)
         if result:
+            StuApplyTeam.objects.get(student_id=student, team_id=team).delete()
             TeamStudent.objects.get(team_id=team, student_id=student).delete()
             profile = "success"
             send_notice(fn, type, profile, sender_id, receiver_id)
@@ -957,6 +958,7 @@ def check_team_out(request):
     elif role == "2":  # admin获取申请加入team的manager
         manager = Manager.objects.get(username=receiver_id)
         if result:
+            ManApplyTeam.objects.get(manager_id=manager, team_id=team).delete()
             TeamManager.objects.get(team_id=team, manager_id=manager).delete()
             profile = "success"
             send_notice(fn, type, profile, sender_id, receiver_id)
@@ -1271,7 +1273,7 @@ def man_get_stu_out_project(request):
     return JsonResponse({"status": 200, "applies": students})
 
 
-def man_check_stu_project(request):
+def man_check_stu_project_in(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
@@ -1289,6 +1291,31 @@ def man_check_stu_project(request):
     if result:
         StuApplyProject.objects.get(student_id=student, project_id=project).delete()
         ProjectStudent.objects.create(project_id=project, student_id=student)
+        profile = "success"
+        send_notice(fn, type, profile, sender_id, receiver_id)
+    else:
+        profile = "fail:" + reason
+        send_notice(fn, type, profile, sender_id, receiver_id)
+    return JsonResponse({"status": 200})
+
+def man_check_stu_project_out(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    sender_id = request.session.get('username')
+    receiver_id = request.POST.get('receiver_id')
+    project_id = request.POST.get('project_id')
+    project = Project.objects.get(ID=project_id)
+    result = request.POST.get('result')
+    reason = request.POST.get('reason')
+
+    fn = time.strftime('%Y%m%d%H%M%S')
+    profile = ""
+    type = "1"
+    student = Student.objects.get(username=receiver_id)
+    if result:
+        StuApplyProject.objects.get(student_id=student, project_id=project).delete()
+        ProjectStudent.objects.get(project_id=project, student_id=student).delete()
         profile = "success"
         send_notice(fn, type, profile, sender_id, receiver_id)
     else:

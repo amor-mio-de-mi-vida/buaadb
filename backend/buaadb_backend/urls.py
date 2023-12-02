@@ -50,7 +50,8 @@ urlpatterns = [
     path("man_delete_project/", man_delete_project),  # 团队管理员删除项目 # finish
     path("man_get_stu_in_project/", man_get_stu_in_project), # 团队管理员获取申请加入项目的学生 # finish
     path("man_get_stu_out_project/", man_get_stu_out_project), # 团队管理员获取申请退出项目的学生 # finish
-    path("man_check_stu_project/", man_check_stu_project), # 团队管理员处理学生申请项目信息 # finish
+    path("man_check_stu_project_in/", man_check_stu_project_in), # 团队管理员处理学生申请项目信息 # finish
+    path("man_check_stu_project_out/", man_check_stu_project_out), # 团队管理员处理学生申请项目信息 # finish
     path("man_get_project_feedback/", man_get_project_feedback), # 团队管理员获取反馈 # finish
     path("get_manage_teams/", get_manage_teams), #团体管理员获取管理的团队
     # ---------上面是团体管理员功能--------下面是系统管理员功能------------ #
