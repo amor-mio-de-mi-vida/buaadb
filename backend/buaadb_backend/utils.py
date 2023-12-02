@@ -24,17 +24,19 @@ def store_file(file, fn, type):
     # 储存图片在本地
     if type == 0:
         addr = settings.IMAGE_DIR + str(file_name) + '.' + suffix
+        URL = settings.IMAGE_PATH + str(file_name) + '.' + suffix
     else:
         addr = settings.FILE_DIR + str(file_name) + '.' + suffix
+        URL = settings.FILE_PATH + str(file_name) + '.' + suffix
     destination = open(addr, 'wb+')
     for chunk in file.chunks():
         destination.write(chunk)
     destination.close()
 
     if type == 0:
-        result = Image.objects.create(url=addr, post_time=fn)
+        result = Image.objects.create(url=URL, post_time=fn)
     else:
-        result = File.objects.create(url=addr, post_time=fn)
+        result = File.objects.create(url=URL, post_time=fn)
 
     return result
 

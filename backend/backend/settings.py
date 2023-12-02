@@ -83,7 +83,7 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'root',
         'NAME': 'buaadb', # 用之前要创建一个这个名字的数据库
-        'PASSWORD': 'viola',
+        'PASSWORD': '20021023',
         'OPTIONS': {'charset': 'utf8'}
     }
 }
