@@ -497,9 +497,10 @@ def get_project(request):
         projects = Project.objects.filter(isCheck=False).all()
         student = Student.objects.get(username=username)
         for project in projects:
+            team = TeamProject.objects.get(project_id=project).team_id
             if project.private:
                 try:
-                    ProjectStudent.objects.get(student_id=student, project_id=project)
+                    TeamStudent.objects.get(student_id=student, team_id=team)
                     result.append({
                         "id": project.ID,
                         "name": project.name,
@@ -519,8 +520,9 @@ def get_project(request):
         manager = Manager.objects.get(username=username)
         for project in projects:
             if project.private:
+                team = TeamProject.objects.get(project_id=project).team_id
                 try:
-                    ProjectManager.objects.get(manager_id=manager, project_id=project)
+                    TeamManager.objects.get(manager_id=manager, team_id=team)
                     result.append({
                         "id": project.ID,
                         "name": project.name,
