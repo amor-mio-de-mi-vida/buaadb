@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -82,7 +83,7 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'root',
         'NAME': 'buaadb', # 用之前要创建一个这个名字的数据库
-        'PASSWORD': '20021023',
+        'PASSWORD': 'viola',
         'OPTIONS': {'charset': 'utf8'}
     }
 }
@@ -147,3 +148,13 @@ FILE_DIR = "./files/"
 OUT_BASE_PATH = 'http://localhost:8080/'
 IMAGE_PATH = OUT_BASE_PATH + 'images/'
 FILE_PATH = OUT_BASE_PATH + 'files/'
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = ('*')
+CORS_ORIGIN_ALLOW_ALL = False
+# 允许跨域请求发送 Cookie
+SESSION_COOKIE_SAMESITE = None
+
+# 设置 CSRF_COOKIE_SECURE 为 True 以确保在 HTTPS 下使用 CSRF Cookie
+CSRF_COOKIE_SECURE = True
