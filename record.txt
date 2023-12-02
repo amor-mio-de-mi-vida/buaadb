@@ -1,0 +1,32 @@
+ npm i axios vue-axios --save 
+ style scoped : 强制执行
+  /*mounted() {
+            // we can implement any method here like
+            this.getPage();
+        }*/
+
+
+11.16
+查看成员bug 只绑定最后一个值
+
+11.17
+float: right 可实现右对齐
+:show-header="false": 隐藏表头
+
+11.22
+@click.native="viewProject(item.id)"才能触发跳转
+
+11.25
+v-for必须写成(item, index)不可写作(index, item)
+headers: {'Content-Type': 'multipart/form-data'},
+method: get 全改为 post
+let param = new URLSearchParams()
+param.append('username', 'admin')
+
+12.1
+解决sessionid变动问题：在main.js中加入axios.defaults.withCredentials=true
+将create()改为created()即可与后端相接，否则为模板信息
+注意最后一起解决异步问题
+
+12.2
+<el-empty v-if="!this.notices.length" description="描述文字"></el-empty>
