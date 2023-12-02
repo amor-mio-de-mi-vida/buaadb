@@ -438,7 +438,7 @@ def get_receive_notice_list(request):
     for relation in relations:
         sender = relation.sender_id
         person.append({
-            "username": sender.username,
+            "id": sender.username,
             "name": sender.first_name
         })
 
@@ -860,21 +860,23 @@ def get_out_team(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     role = request.session.get('role')
-    team_id = request.POST.get('team_id')
-    team = Team.objects.get(ID=team_id)
+    # team_id = request.POST.get('team_id')
+    # team = Team.objects.get(ID=team_id)
 
     if role == "1":  # manager获取申请加入team的学生
         students = []
-        relations = StuApplyTeam.objects.filter(team_id=team, status=True).all()
+        relations = StuApplyTeam.objects.filter(status=True).all()
         for relation in relations:
             students.append({
-                "username": relation.student_id.username,
-                "name": relation.student_id.first_name
+                "student_id": relation.student_id.username,
+                "student_name": relation.student_id.first_name,
+                "team_id": relation.team_id.ID,
+                "team_name": relation.team_id.name
             })
         return JsonResponse({"status": 200, "ids": students})
     elif role == "2":  # admin获取申请加入team的manager
         managers = []
-        relations = ManApplyTeam.objects.filter(team_id=team, status=True).all()
+        relations = ManApplyTeam.objects.filter(status=True).all()
         for relation in relations:
             managers.append({
                 "username": relation.manager_id.username,
@@ -926,6 +928,7 @@ def check_team_in(request):
         return JsonResponse({"status": 200})
     else:
         return JsonResponse({"status": 400})
+
 
 def check_team_out(request):
     if request.method != "POST":
