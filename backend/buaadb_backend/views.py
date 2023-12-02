@@ -431,9 +431,58 @@ def get_receive_notice_list(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     username = request.session.get('username')
-    notices = get_notice(username=username, is_sender=False)
+    role = request.session.get('role')
+    receiver = User.objects.get(username=username)
 
-    return JsonResponse({"status": 200, "notices": notices})
+    person = []
+    relations = ANoticeB.objects.filter(receiver_id=receiver).all()
+    for relation in relations:
+        sender = relation.sender_id
+        person.append({
+            "username": sender.username,
+            "name": sender.first_name
+        })
+
+    teams = []
+    projects = []
+
+    if role == "0":
+        student = Student.objects.get(username=username)
+        relations = TeamStudent.objects.filter(student_id=student).all()
+        for relation in relations:
+            teams.append({
+                "id": relation.team_id.ID,
+                "name": relation.team_id.name
+            })
+        relations = ProjectStudent.objects.filter(student_id=student).all()
+        for relation in relations:
+            projects.append({
+                "id": relation.project_id.ID,
+                "name": relation.project_id.name,
+                "time": relation.project_id.time
+            })
+    elif role == "1":
+        manager = Manager.objects.get(username=username)
+        relations = TeamManager.objects.filter(manager_id=manager).all()
+        for relation in relations:
+            teams.append({
+                "id": relation.team_id.ID,
+                "name": relation.team_id.name
+            })
+        relations = ProjectManager.objects.filter(manager_id=manager).all()
+        for relation in relations:
+            projects.append({
+                "id": relation.project_id.ID,
+                "name": relation.project_id.name,
+                "time": relation.project_id.time
+            })
+
+    return JsonResponse({
+        "status": 200,
+        "person": person,
+        "teams": teams,
+        "projects": projects
+    })
 
 
 def get_project(request):
