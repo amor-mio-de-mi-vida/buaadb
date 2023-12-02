@@ -980,11 +980,15 @@ def apply_team_in(request):
 
     if role == "0":
         student = Student.objects.get(username=username)
-        StuApplyTeam.objects.create(student_id=student, team_id=team, status=False)
+        count = StuApplyTeam.objects.filter(student_id=student, team_id=team).count()
+        if count == 0:
+            StuApplyTeam.objects.create(student_id=student, team_id=team, status=False)
         return JsonResponse({"status": 200})
     elif role == "1":
         manager = Manager.objects.get(username=username)
-        ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=False)
+        count = ManApplyTeam.objects.filter(manager_id=manager, team_id=team).count()
+        if count == 0:
+            ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=False)
         return JsonResponse({"status": 200})
     else:
         return JsonResponse({"status": 400})
@@ -1001,11 +1005,15 @@ def apply_team_out(request):
 
     if role == "0":
         student = Student.objects.get(username=username)
-        StuApplyTeam.objects.create(student_id=student, team_id=team, status=True)
+        count = StuApplyTeam.objects.filter(student_id=student, team_id=team).count()
+        if count == 0:
+            StuApplyTeam.objects.create(student_id=student, team_id=team, status=True)
         return JsonResponse({"status": 200})
     elif role == "1":
         manager = Manager.objects.get(username=username)
-        ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=True)
+        count = ManApplyTeam.objects.filter(manager_id=manager, team_id=team).count()
+        if count == 0:
+            ManApplyTeam.objects.create(manager_id=manager, team_id=team, status=True)
         return JsonResponse({"status": 200})
     else:
         return JsonResponse({"status": 400})
@@ -1056,7 +1064,9 @@ def stu_apply_project_in(request):
     project = Project.objects.get(ID=project_id)
 
     student = Student.objects.get(username=username)
-    StuApplyProject.objects.create(student_id=student, project_id=project, status=False)
+    count = StuApplyProject.objects.filter(student_id=student, project_id=project).count()
+    if count == 0:
+        StuApplyProject.objects.create(student_id=student, project_id=project, status=False)
     return JsonResponse({"status": 200})
 
 
@@ -1069,7 +1079,10 @@ def stu_apply_project_out(request):
     project = Project.objects.get(ID=project_id)
 
     student = Student.objects.get(username=username)
-    StuApplyProject.objects.create(student_id=student, project_id=project, status=True)
+
+    count = StuApplyProject.objects.filter(student_id=student, project_id=project).count()
+    if count == 0:
+        StuApplyProject.objects.create(student_id=student, project_id=project, status=True)
     return JsonResponse({"status": 200})
 
 
