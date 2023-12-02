@@ -497,9 +497,9 @@ def get_project(request):
         projects = Project.objects.filter(isCheck=False).all()
         student = Student.objects.get(username=username)
         for project in projects:
-            team = TeamProject.objects.get(project_id=project).team_id
             if project.private:
                 try:
+                    team = TeamProject.objects.get(project_id=project).team_id
                     TeamStudent.objects.get(student_id=student, team_id=team)
                     result.append({
                         "id": project.ID,
@@ -520,8 +520,8 @@ def get_project(request):
         manager = Manager.objects.get(username=username)
         for project in projects:
             if project.private:
-                team = TeamProject.objects.get(project_id=project).team_id
                 try:
+                    team = TeamProject.objects.get(project_id=project).team_id
                     TeamManager.objects.get(manager_id=manager, team_id=team)
                     result.append({
                         "id": project.ID,
@@ -877,7 +877,7 @@ def get_out_team(request):
         return JsonResponse({"status": 400})
 
 
-def check_team(request):
+def check_team_in(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
@@ -919,6 +919,46 @@ def check_team(request):
     else:
         return JsonResponse({"status": 400})
 
+def check_team_out(request):
+    if request.method != "POST":
+        return JsonResponse({"status": 500})  # 非POST请求
+
+    sender_id = request.session.get('username')
+    role = request.session.get('role')
+    receiver_id = request.POST.get('receiver_id')
+    team_id = request.POST.get('team_id')
+    team = Team.objects.get(ID=team_id)
+    result = request.POST.get('result')
+    reason = request.POST.get('reason')
+
+    fn = time.strftime('%Y%m%d%H%M%S')
+    profile = ""
+
+    if role == "1":  # manager获取申请加入team的学生
+        student = Student.objects.get(username=receiver_id)
+        if result:
+            TeamStudent.objects.get(team_id=team, student_id=student).delete()
+            type = "success"
+            send_notice(fn, type, profile, sender_id, receiver_id)
+        else:
+            profile = reason
+            type = "fail"
+            send_notice(fn, type, profile, sender_id, receiver_id)
+        return JsonResponse({"status": 200})
+    elif role == "2":  # admin获取申请加入team的manager
+        manager = Manager.objects.get(username=receiver_id)
+        if result:
+            ManApplyTeam.objects.get(manager_id=manager, team_id=team).delete()
+            TeamManager.objects.create(team_id=team, manager_id=manager)
+            type = "success"
+            send_notice(fn, type, profile, sender_id, receiver_id)
+        else:
+            profile = reason
+            type = "fail"
+            send_notice(fn, type, profile, sender_id, receiver_id)
+        return JsonResponse({"status": 200})
+    else:
+        return JsonResponse({"status": 400})
 
 def apply_team_in(request):
     if request.method != "POST":
