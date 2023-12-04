@@ -60,4 +60,10 @@ urlpatterns = [
     path("admin_get_apply_project/", admin_get_apply_project),  # 系统管理员审核团体 # finish
     path("admin_check_apply_team/", admin_check_apply_team),  # 系统管理员处理待审核团体 # finish
     path("admin_check_apply_project/", admin_check_apply_project),  # 系统管理员审核项目 # finish
+    path("man_pub_sign/", man_pub_sign), # 团体管理员发布签到
+    path("man_get_signList/",man_get_signList), # 团体管理员查看项目中发布的签到列表
+    path("man_get_signprofile/",man_get_signprofile), # 团体管理员查看签到的具体信息
+    path("man_modify_sign/", man_modify_sign), # 团体管理员修改某次签到的状态
+    path("stu_get_signlist/", stu_get_signlist), # 学生获取某个项目的签到列表
+    path("stu_signin/", stu_signin) # 学生签到
 ]

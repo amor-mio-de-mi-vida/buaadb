@@ -1512,3 +1512,131 @@ def admin_check_apply_project(request):
         send_notice(fn, type, profile, sender_id, receiver_id)
 
     return JsonResponse({"status": 200})
+
+
+def man_pub_sign(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    project_id = request.POST.get('project_id')
+    project = Project.objects.get(ID=project_id)
+    name = request.POST.get('name')
+    fn = time.strftime('%Y%m%d%H%M%S')
+    latitude = request.POST.get('latitude')
+    longitude = request.POST.get('longitude')
+
+    count = Sign.objects.filter(name=name).count()
+    if count == 0:
+        sign = Sign.objects.create(project=project, name=name, time=fn, latitude=latitude, longitude=longitude)
+        relations = ProjectStudent.objects.filter(project_id=project).all()
+
+        for relation in relations:
+            student = relation.student_id
+            StudentSign.objects.create(student=student, sign=sign)
+
+    return JsonResponse({"status": 200})
+
+def man_get_signList(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    project_id = request.POST.get('project_id')
+    project = Project.objects.get(ID=project_id)
+    signs = Sign.objects.filter(project=project).all()
+
+    result = []
+    for sign in signs:
+        result.append({
+            "sign_id": sign.id,
+            "name": sign.name,
+            "time": sign.time
+        })
+
+    return JsonResponse({"status": 200, "result": result})
+
+
+def man_get_signprofile(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    sign_id = request.POST.get('sign_id')
+    sign = Sign.objects.get(id=sign_id)
+    project_id = request.POST.get('project_id')
+    project = Project.objects.get(ID=project_id)
+
+    relations = ProjectStudent.objects.filter(project_id=project).all()
+
+    result = []
+    for relation in relations:
+        student = relation.student_id
+        studentSign = StudentSign.objects.get(student=student, sign=sign)
+        result.append({
+            "student_username": student.username,
+            "student_name": student.name,
+            "state": studentSign.state,
+            "message": studentSign.message
+        })
+
+    return JsonResponse({"status": 200, "result": result})
+
+
+def man_modify_sign(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    sign_id = request.POST.get('sign_id')
+    sign = Sign.objects.get(id=sign_id)
+    student_username = request.POST.get('student_username')
+    student = Student.objects.get(username=student_username)
+    state = request.POST.get('state')
+    message = request.POST.get('message')
+
+    studentSign = StudentSign.objects.get(student=student, sign=sign)
+    studentSign.state = state
+    studentSign.message = message
+    studentSign.save()
+
+    return JsonResponse({"status": 200})
+
+def stu_get_signlist(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    username = request.session.get('username')
+    student = Student.objects.get(username=username)
+    project_id  = request.POST.get('project_id')
+    project = Project.objects.get(ID=project_id)
+    signs = Sign.objects.filter(project=project).all()
+    result = []
+
+    for sign in signs:
+        relation = StudentSign.objects.get(sign=sign, student=student)
+        result.append({
+            "sign_id": sign.id,
+            "name": sign.name,
+            "state": relation.state,
+            "message": relation.message
+        })
+
+    return JsonResponse({"status": 200, "signs": result})
+
+def stu_signin(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    student_id = request.session.get('username')
+    student = Student.objects.get(username=student_id)
+    sign_id = request.POST.get('sign_id')
+    sign = Sign.objects.get(id=sign_id)
+    latitude = request.POST.get('latitude')
+    longitude = request.POST.get('longitude')
+    fn = time.strftime('%Y%m%d%H%M%S')
+
+    if True:
+        relation = StudentSign.objects.get(student=student, sign=sign)
+        relation.state = True
+        relation.message = "已签到"
+        relation.save()
+        return JsonResponse({"status": 200})
+    else:
+        return JsonResponse({"status": 400})

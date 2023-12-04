@@ -65,7 +65,7 @@ class Team(models.Model):
     ID = models.AutoField(primary_key=True, db_column='team_id')
     name = models.CharField(max_length=128, db_column='name')
     profile = models.TextField(max_length=4096, db_column='profile')
-    submit_time = models.CharField(max_length=128, db_column='submit_time') # 提交申请队伍的时间
+    submit_time = models.CharField(max_length=128, db_column='submit_time')  # 提交申请队伍的时间
     image_id = models.CharField(max_length=1024, db_column="image_id")
     isCheck = models.BooleanField(db_column='isCheck', default=True)  # 是否在审核中
 
@@ -326,12 +326,14 @@ class ProjectNotice(models.Model):
     class Meta:
         db_table = 'project_notice'
 
+
 class TeamNotice(models.Model):
     team_id = models.ForeignKey('Team', on_delete=models.CASCADE, db_column='team_id')
     notice_id = models.ForeignKey('Notice', on_delete=models.CASCADE, db_column='notice_id')
 
     class Meta:
         db_table = 'team_notice'
+
 
 class ProjectManager(models.Model):
     project_id = models.ForeignKey('Project', on_delete=models.CASCADE, db_column='project_id')
@@ -342,8 +344,10 @@ class ProjectManager(models.Model):
 
 
 class ANoticeB(models.Model):
-    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Notice_sender',  on_delete=models.CASCADE, db_column='sender_id')
-    receiver_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Notice_receiver', on_delete=models.CASCADE, db_column='receiver_id')
+    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Notice_sender', on_delete=models.CASCADE,
+                                  db_column='sender_id')
+    receiver_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Notice_receiver', on_delete=models.CASCADE,
+                                    db_column='receiver_id')
     notice_id = models.ForeignKey('Notice', on_delete=models.CASCADE, db_column='notice_id')
 
     class Meta:
@@ -351,9 +355,33 @@ class ANoticeB(models.Model):
 
 
 class AMessageB(models.Model):
-    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Message_sender', on_delete=models.CASCADE, db_column='sender_id')
-    receiver_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Message_receiver', on_delete=models.CASCADE, db_column='receiver_id')
+    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Message_sender', on_delete=models.CASCADE,
+                                  db_column='sender_id')
+    receiver_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='Message_receiver', on_delete=models.CASCADE,
+                                    db_column='receiver_id')
     message_id = models.ForeignKey('Message', on_delete=models.CASCADE, db_column='message_id')
 
     class Meta:
         db_table = 'A_message_B'
+
+
+class Sign(models.Model):
+    id = models.AutoField(primary_key=True, db_column='sign_ID')
+    name = models.CharField(max_length=255, db_column='name')
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, db_column='class_id')
+    latitude = models.CharField(max_length=255, db_column='latitude')
+    longitude = models.CharField(max_length=255, db_column='longitude')
+    time = models.CharField(max_length=255, db_column='time')
+
+    class Meta:
+        db_table = 'Sign'
+
+
+class StudentSign(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_ID')
+    sign = models.ForeignKey('Sign', on_delete=models.CASCADE, db_column='sign_ID')
+    state = models.BooleanField(db_column='state', default=False)
+    message = models.TextField(max_length=4096, db_column='message', default="未签到")
+
+    class Meta:
+        db_table = 'StudentSign'
