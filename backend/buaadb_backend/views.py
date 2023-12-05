@@ -933,6 +933,7 @@ def check_team_in(request):
     else:
         return JsonResponse({"status": 400})
 
+
 def check_team_out(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
@@ -974,6 +975,7 @@ def check_team_out(request):
         return JsonResponse({"status": 200})
     else:
         return JsonResponse({"status": 400})
+
 
 def apply_team_in(request):
     if request.method != "POST":
@@ -1322,6 +1324,7 @@ def man_check_stu_project_in(request):
         send_notice(fn, type, profile, sender_id, receiver_id)
     return JsonResponse({"status": 200})
 
+
 def man_check_stu_project_out(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
@@ -1481,6 +1484,7 @@ def man_pub_sign(request):
 
     return JsonResponse({"status": 200})
 
+
 def man_get_signList(request):
     if request.method != 'POST':
         return JsonResponse({"status": 500})
@@ -1543,13 +1547,14 @@ def man_modify_sign(request):
 
     return JsonResponse({"status": 200})
 
+
 def stu_get_signlist(request):
     if request.method != 'POST':
         return JsonResponse({"status": 500})
 
     username = request.session.get('username')
     student = Student.objects.get(username=username)
-    project_id  = request.POST.get('project_id')
+    project_id = request.POST.get('project_id')
     project = Project.objects.get(ID=project_id)
     signs = Sign.objects.filter(project=project).all()
     result = []
@@ -1564,6 +1569,7 @@ def stu_get_signlist(request):
         })
 
     return JsonResponse({"status": 200, "signs": result})
+
 
 def stu_signin(request):
     if request.method != 'POST':
@@ -1585,3 +1591,20 @@ def stu_signin(request):
         return JsonResponse({"status": 200})
     else:
         return JsonResponse({"status": 400})
+
+
+def search_project_tag(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    tag_name = request.POST.get("tag")
+    relations = ProjectTag.objects.filter(tag_name=tag_name).all()
+    result = []
+    for relation in relations:
+        result.append({
+            "id": relation.project_id.ID,
+            "name": relation.project_id.name,
+            "time": relation.project_id.time
+        })
+
+    return JsonResponse({"status": 200, "projects": result})
