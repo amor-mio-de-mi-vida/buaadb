@@ -145,7 +145,7 @@ FILE_DIR = "./files/"
 
 
 # 资源外部访问路径
-OUT_BASE_PATH = 'http://localhost:8080/'
+OUT_BASE_PATH = 'http://localhost:8082/'
 IMAGE_PATH = OUT_BASE_PATH + 'images/'
 FILE_PATH = OUT_BASE_PATH + 'files/'
 

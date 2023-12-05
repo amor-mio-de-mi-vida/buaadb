@@ -128,12 +128,20 @@ def get_personal_profile(request):
         res_wx_id = res_stu.wx_id
         res_faculty_id = res_stu.faculty_id
         res_image_id = res_stu.image_id
+        res_image_url = ''
+        if res_image_id:
+            image = Image.objects.get(ID=res_image_id)
+            res_image_url = image.url
     elif role == "1":
         res_man = Manager.objects.get(username=res)
         res_image_id = res_man.image_id
+        image = Image.objects.get(ID=res_image_id)
+        res_image_url = image.url
     else:
         res_admin = Adminstrator.objects.get(username=res)
         res_image_id = res_admin.image_id
+        image = Image.objects.get(ID=res_image_id)
+        res_image_url = image.url
 
     return JsonResponse({
         'status': 200,
@@ -144,7 +152,8 @@ def get_personal_profile(request):
         'id_number': res_id_number,
         'wx_id': res_wx_id,
         'faculty_id': res_faculty_id,
-        'image_id': res_image_id,
+        # 'image_id': res_image_id,
+        'image_url': res_image_url,
         'role': role
     })
 
@@ -676,7 +685,8 @@ def stu_get_project(request):
             "id": relation.project_id.ID,
             "name": relation.project_id.name,
             "time": relation.project_id.time,
-            "position": relation.project_id.place
+            "position": relation.project_id.place,
+            "dialogVisible": False
         })
 
     return JsonResponse({"status": 200, "projects": projects})
@@ -1076,12 +1086,12 @@ def get_feedback_profile(request):
             "url": file.file_id.url
         })
 
-    for image in images:
+    '''for image in images:
         image_profile.append({
             "image_id": image.image_id.ID,
             "post_time": image.image_id.post_time,
             "url": image.image_id.url
-        })
+        })'''
 
     return JsonResponse({
         "status": 200,
@@ -1138,13 +1148,15 @@ def stu_pub_feedback(request):
     fn = time.strftime('%Y%m%d%H%M%S')
 
     feedback = Feedback.objects.create(profile=profile, student_id=student, project_id=project)
-    for image in images:
-        image_id = store_file(image, fn, 0)
-        FeedbackImage.objects.create(image_id=image_id, feedback_id=feedback, post_time=fn)
+    if images:
+        for image in images:
+            image_id = store_file(image, fn, 0)
+            FeedbackImage.objects.create(image_id=image_id, feedback_id=feedback, post_time=fn)
 
-    for file in files:
-        file_id = store_file(file, fn, 1)
-        FeedbackFile.objects.create(file_id=file_id, feedback_id=feedback, post_time=fn)
+    #if files:
+    #    for file in files:
+    file_id = store_file(files, fn, 1)
+    FeedbackFile.objects.create(file_id=file_id, feedback_id=feedback, post_time=fn)
     return JsonResponse({"status": 200})
 
 
@@ -1275,7 +1287,7 @@ def man_create_project(request):
     profile = request.POST.get('profile')
     state = request.POST.get('state')
     quest_url = request.POST.get('quest_url')
-    tags = request.POST.get('tags')
+    tag = request.POST.get('tag')
     images = request.FILES.get('images')
     files = request.FILES.get('files')
     fn = time.strftime('%Y%m%d%H%M%S')
@@ -1287,9 +1299,9 @@ def man_create_project(request):
         team = Team.objects.get(ID=team_id)
         TeamProject.objects.create(team_id=team, project_id=project)
     ProjectManager.objects.create(project_id=project, manager_id=manager)
-    if tags:
-        for tag in tags:
-            ProjectTag.objects.create(project_id=project, tag_name=tag)
+
+    ProjectTag.objects.create(project_id=project, tag_name=tag)
+
     if images:
         for image in images:
             image_id = store_file(image, fn, 0)
@@ -1652,6 +1664,7 @@ def search_project_tag(request):
         return JsonResponse({"status": 500})
 
     tag_name = request.POST.get("tag")
+    print(tag_name)
     relations = ProjectTag.objects.filter(tag_name=tag_name).all()
     result = []
     for relation in relations:

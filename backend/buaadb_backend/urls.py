@@ -54,6 +54,7 @@ urlpatterns = [
     path("man_check_stu_project_out/", man_check_stu_project_out), # 团队管理员处理学生申请项目信息 # finish
     path("man_get_project_feedback/", man_get_project_feedback), # 团队管理员获取反馈 # finish
     path("get_manage_teams/", get_manage_teams), #团体管理员获取管理的团队
+    path("get_manage_projects/", get_manage_projects), #团体管理员获取管理的公开项目
     # ---------上面是团体管理员功能--------下面是系统管理员功能------------ #
     path("admin_get_apply_team/", admin_get_apply_team),  # 系统管理员查看待审核团体 # finish
     path("admin_get_apply_project/", admin_get_apply_project),  # 系统管理员审核团体 # finish
@@ -64,5 +65,6 @@ urlpatterns = [
     path("man_get_signprofile/",man_get_signprofile), # 团体管理员查看签到的具体信息
     path("man_modify_sign/", man_modify_sign), # 团体管理员修改某次签到的状态
     path("stu_get_signlist/", stu_get_signlist), # 学生获取某个项目的签到列表
-    path("stu_signin/", stu_signin) # 学生签到
+    path("stu_signin/", stu_signin), # 学生签到
+    path("search_project_tag/", search_project_tag)
 ]
