@@ -5,6 +5,13 @@
 
 
 
+### requirements
+
+```text
+Django==4.2.6
+PyMySQL==1.1.0
+```
+
 ### run backend
 
 在backend目录下运行
