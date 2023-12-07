@@ -271,12 +271,12 @@ def get_teams(request):
     teams = Team.objects.filter(isCheck=False).all()
 
     for team in teams:
-        #image = team.image_id
-        #image_url = Image.objects.get(ID=image).url
+        image = team.image_id
+        image_url = Image.objects.get(ID=image).url
         result.append({
             "id": team.ID,
             "name": team.name,
-            #"image_url": image_url
+            "image_url": image_url
         })
 
     return JsonResponse({"status": 200, "teams": result})
@@ -524,18 +524,22 @@ def get_project(request):
                 try:
                     team = TeamProject.objects.get(project_id=project).team_id
                     TeamStudent.objects.get(student_id=student, team_id=team)
+                    image = ImageProject.objects.get(project_id=project).image_id
                     result.append({
                         "id": project.ID,
                         "name": project.name,
-                        "time": project.time
+                        "time": project.time,
+                        "url": image.url
                     })
                 except models.ObjectDoesNotExist:
                     continue
             else:
+                image = ImageProject.objects.get(project_id=project).image_id
                 result.append({
                     "id": project.ID,
                     "name": project.name,
-                    "time": project.time
+                    "time": project.time,
+                    "url": image.url
                 })
         return JsonResponse({"status": 200, "projects": result})
     elif role == "1":
@@ -546,28 +550,34 @@ def get_project(request):
                 try:
                     team = TeamProject.objects.get(project_id=project).team_id
                     TeamManager.objects.get(manager_id=manager, team_id=team)
+                    image = ImageProject.objects.get(project_id=project).image_id
                     result.append({
                         "id": project.ID,
                         "name": project.name,
-                        "time": project.time
+                        "time": project.time,
+                        "url": image.url
                     })
                 except models.ObjectDoesNotExist:
                     continue
             else:
+                image = ImageProject.objects.get(project_id=project).image_id
                 result.append({
                     "id": project.ID,
                     "name": project.name,
-                    "time": project.time
+                    "time": project.time,
+                    "url": image.url
                 })
         return JsonResponse({"status": 200, "projects": result})
     elif role == "2":
         result = []
         projects = Project.objects.all()
         for project in projects:
+            image = ImageProject.objects.get(project_id=project).image_id
             result.append({
                 "id": project.ID,
                 "name": project.name,
-                "time": project.time
+                "time": project.time,
+                "url": image.url
             })
         return JsonResponse({"status": 200, "projects": result})
     else:
@@ -583,9 +593,9 @@ def get_project_profile(request):
     project = Project.objects.get(ID=project_id)
 
     tags = []
-    # relations = ProjectTag.objects.filter(project_id=project).all()
-    # for relation in relations:
-    #     tags.append(relation.tag_name)
+    relations = ProjectTag.objects.filter(project_id=project).all()
+    for relation in relations:
+        tags.append(relation.tag_name)
     managers = []
     relations = ProjectManager.objects.filter(project_id=project).all()
     for relation in relations:
@@ -608,6 +618,8 @@ def get_project_profile(request):
         team = relation.team_id
         team_name = team.name
 
+    image = ImageProject.objects.get(project_id=project).image_id
+
     return JsonResponse({
         "status": 200,
         "name": project.name,
@@ -622,6 +634,7 @@ def get_project_profile(request):
         "tags": tags,
         "managers": managers,
         "students": students,
+        "url": image.url,
         "role": role
     })
 
@@ -703,12 +716,19 @@ def get_discussion(request):
     relations = DiscussionProject.objects.filter(project_id=project).all()
     for relation in relations:
         discussion = relation.discussion_id
+        if get_role(discussion.author.username) == 0:
+            stu = Student.objects.get(username=discussion.author.username)
+            image = Image.objects.get(ID=stu.image_id)
+        else:
+            man = Manager.objects.get(username=discussion.author.username)
+            image = Image.objects.get(ID=man.image_id)
         discussions.append({
             "id": discussion.ID,
             "title": discussion.title,
             "time": discussion.time,
             "author_name": discussion.author.first_name,
-            "author_id": discussion.author.username
+            "author_id": discussion.author.username,
+            "author_url": image.url
         })
     return JsonResponse({"status": 200, "discussions": discussions})
 
@@ -722,6 +742,13 @@ def get_discussion_profile(request):
     messages = DiscussionMessage.objects.filter(discussion_id=discussion).all()
     project = DiscussionProject.objects.filter(discussion_id=discussion).first()
 
+    if get_role(discussion.author.username) == 0:
+        stu = Student.objects.get(username=discussion.author.username)
+        image = Image.objects.get(ID=stu.image_id)
+    else:
+        man = Manager.objects.get(username=discussion.author.username)
+        image = Image.objects.get(ID=man.image_id)
+
     return JsonResponse({
         "status": 200,
         "id": discussion.ID,
@@ -729,6 +756,7 @@ def get_discussion_profile(request):
         "type": discussion.type,
         "title": discussion.title,
         "author": discussion.author,
+        "author_url": image.url,
         "project_id": project,
         "messsages": messages
     })
@@ -753,7 +781,7 @@ def pub_message(request):
     DiscussionMessage.objects.create(discussion_id=discussion, message_id=message)
     AMessageB.objects.create(sender_id=sender, receiver_id=receiver, message_id=message)
 
-    '''for image in images:
+    for image in images:
         addr = store_file(image, fn, 0)
         # 写数据库
         img = Image.objects.create(url=addr, post_time=fn)
@@ -763,7 +791,7 @@ def pub_message(request):
         addr = store_file(file, fn, 1)
         # 写数据库
         file = File.objects.create(url=addr, post_time=fn)
-        FileMessage.objects.create(file_id=file, message_id=message)'''
+        FileMessage.objects.create(file_id=file, message_id=message)
 
     return JsonResponse({"status": 200})
 
@@ -773,7 +801,6 @@ def get_discussion_replies(request):
         return JsonResponse({"status": 500})  # 非POST请求
 
     discussion_id = request.POST.get("discussion_id")
-    discussion = Discussion.objects.get(ID=discussion_id)
     relations = DiscussionMessage.objects.filter(discussion_id=discussion_id).all()
 
     messages = []
