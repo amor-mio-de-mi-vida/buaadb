@@ -1754,7 +1754,6 @@ def gen_sign_result_form(request):
             status = '已签到'
         data.append([student.username, student.real_name, status, relation.message])
 
-    fn = time.strftime('%Y%m%d%H%M%S')
     file_name = sign.name + '.csv'
 
     with open(CSVFILE_DIR + file_name, 'w', newline='') as csvfile:
