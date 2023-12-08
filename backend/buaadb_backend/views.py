@@ -805,17 +805,22 @@ def get_discussion_replies(request):
 
     messages = []
     for relation in relations:
+        message = relation.message_id
+        message_image = ImageMessage.objects.get(message_id=message).image_id
         amessageb = AMessageB.objects.get(message_id=relation.message_id)
         sender = amessageb.sender_id
+        from_image = ImageUser.objects.get(user_id=sender).image_id
         from_name = sender.first_name
         receiver = amessageb.receiver_id
         to_name = receiver.first_name
         messages.append({
             "id": relation.message_id.ID,
+            "message_url": message_image.url,
             "post_time": relation.message_id.post_time,
             "text": relation.message_id.text,
             "from_name": from_name,
             "from_id": sender.username,
+            "from_url": from_image.url,
             "to_name": to_name,
             "to_id": receiver.username,
             "visible": False
