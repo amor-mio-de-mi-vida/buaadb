@@ -2541,5 +2541,1424 @@ tag: string
 |---|---|---|---|---|---|
 |» project_id|string|true|none||none|
 
+## POST 生成项目内学生信息的表格
+
+POST /buaa_db/gen_stu_profile_form/
+
+> Body 请求参数
+
+```yaml
+project_id: string
+
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|object| 否 |none|
+|» project_id|body|string| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
+```json
+{
+  "form_url": "string"
+}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
+
+### 返回数据结构
+
+状态码 **200**
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|» form_url|string|true|none||none|
+
+## POST 生成签到结果的表格
+
+POST /buaa_db/gen_sign_result_form/
+
+> Body 请求参数
+
+```yaml
+sign_id: string
+
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|object| 否 |none|
+|» sign_id|body|string| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
+```json
+{
+  "form_url": "string"
+}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|成功|Inline|
+
+### 返回数据结构
+
+状态码 **200**
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|» form_url|string|true|none||none|
+
 # 数据模型
+
+<h2 id="tocS_StudentSign">StudentSign</h2>
+
+<a id="schemastudentsign"></a>
+<a id="schema_StudentSign"></a>
+<a id="tocSstudentsign"></a>
+<a id="tocsstudentsign"></a>
+
+```json
+{
+  "student": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "real_name": "string",
+    "phone_id": "string",
+    "id_number": "string",
+    "wx_id": "string",
+    "faculty_id": "string",
+    "image_id": "string"
+  },
+  "sign": {
+    "id": "string",
+    "name": "string",
+    "project": {
+      "ID": "string",
+      "name": "string",
+      "time": "string",
+      "place": "string",
+      "profile": "string",
+      "state": true,
+      "quest_url": "string",
+      "private": true,
+      "isCheck": true
+    },
+    "latitude": "string",
+    "longitude": "string",
+    "time": "string"
+  },
+  "state": true,
+  "message": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|student|[Student](#schemastudent)|true|none|学生|none|
+|sign|[Sign](#schemasign)|true|none|签到|none|
+|state|boolean|true|none|签到状态|none|
+|message|string|true|none|签到备注|none|
+
+<h2 id="tocS_Sign">Sign</h2>
+
+<a id="schemasign"></a>
+<a id="schema_Sign"></a>
+<a id="tocSsign"></a>
+<a id="tocssign"></a>
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "project": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  },
+  "latitude": "string",
+  "longitude": "string",
+  "time": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|id|string|true|none|签到id|none|
+|name|string|true|none|签到名|none|
+|project|[Project](#schemaproject)|true|none|签到所属项目|none|
+|latitude|string|true|none|经度|none|
+|longitude|string|true|none|纬度|none|
+|time|string|true|none|发布时间|none|
+
+<h2 id="tocS_AMessageB">AMessageB</h2>
+
+<a id="schemaamessageb"></a>
+<a id="schema_AMessageB"></a>
+<a id="tocSamessageb"></a>
+<a id="tocsamessageb"></a>
+
+```json
+{
+  "sender_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string"
+  },
+  "receiver_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string"
+  },
+  "message_id": {
+    "ID": "string",
+    "post_time": "string",
+    "text": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|sender_id|[User](#schemauser)|true|none|回复发送者|none|
+|receiver_id|[User](#schemauser)|true|none|回复发送者|none|
+|message_id|[Message](#schemamessage)|true|none|回复|none|
+
+<h2 id="tocS_ANoticeB">ANoticeB</h2>
+
+<a id="schemaanoticeb"></a>
+<a id="schema_ANoticeB"></a>
+<a id="tocSanoticeb"></a>
+<a id="tocsanoticeb"></a>
+
+```json
+{
+  "sender_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string"
+  },
+  "receiver_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string"
+  },
+  "notice_id": {
+    "ID": "string",
+    "time": "string",
+    "type": "string",
+    "profile": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|sender_id|[User](#schemauser)|true|none|回复发送者|none|
+|receiver_id|[User](#schemauser)|true|none|回复发送者|none|
+|notice_id|[Notice](#schemanotice)|true|none|消息|none|
+
+<h2 id="tocS_ProjectManager">ProjectManager</h2>
+
+<a id="schemaprojectmanager"></a>
+<a id="schema_ProjectManager"></a>
+<a id="tocSprojectmanager"></a>
+<a id="tocsprojectmanager"></a>
+
+```json
+{
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  },
+  "manager_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "image_id": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+|manager_id|[Manager](#schemamanager)|true|none|团队管理员|none|
+
+<h2 id="tocS_TeamNotice">TeamNotice</h2>
+
+<a id="schemateamnotice"></a>
+<a id="schema_TeamNotice"></a>
+<a id="tocSteamnotice"></a>
+<a id="tocsteamnotice"></a>
+
+```json
+{
+  "team_id": {
+    "ID": "string",
+    "name": "string",
+    "profile": "string",
+    "submit_time": "string",
+    "image_id": "string",
+    "isCheck": true
+  },
+  "notice_id": {
+    "ID": "string",
+    "time": "string",
+    "type": "string",
+    "profile": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|team_id|[Team](#schemateam)|true|none|团队|none|
+|notice_id|[Notice](#schemanotice)|true|none|消息|none|
+
+<h2 id="tocS_ProjectNotice">ProjectNotice</h2>
+
+<a id="schemaprojectnotice"></a>
+<a id="schema_ProjectNotice"></a>
+<a id="tocSprojectnotice"></a>
+<a id="tocsprojectnotice"></a>
+
+```json
+{
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  },
+  "notice_id": {
+    "ID": "string",
+    "time": "string",
+    "type": "string",
+    "profile": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+|notice_id|[Notice](#schemanotice)|true|none|消息|none|
+
+<h2 id="tocS_ProjectTag">ProjectTag</h2>
+
+<a id="schemaprojecttag"></a>
+<a id="schema_ProjectTag"></a>
+<a id="tocSprojecttag"></a>
+<a id="tocsprojecttag"></a>
+
+```json
+{
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  },
+  "tag_name": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+|tag_name|string|true|none|标签名|none|
+
+<h2 id="tocS_ProjectStudent">ProjectStudent</h2>
+
+<a id="schemaprojectstudent"></a>
+<a id="schema_ProjectStudent"></a>
+<a id="tocSprojectstudent"></a>
+<a id="tocsprojectstudent"></a>
+
+```json
+{
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  },
+  "student_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "real_name": "string",
+    "phone_id": "string",
+    "id_number": "string",
+    "wx_id": "string",
+    "faculty_id": "string",
+    "image_id": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+|student_id|[Student](#schemastudent)|true|none|学生|none|
+
+<h2 id="tocS_ManApplyTeam">ManApplyTeam</h2>
+
+<a id="schemamanapplyteam"></a>
+<a id="schema_ManApplyTeam"></a>
+<a id="tocSmanapplyteam"></a>
+<a id="tocsmanapplyteam"></a>
+
+```json
+{
+  "team_id": {
+    "ID": "string",
+    "name": "string",
+    "profile": "string",
+    "submit_time": "string",
+    "image_id": "string",
+    "isCheck": true
+  },
+  "manager_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "image_id": "string"
+  },
+  "status": true
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|team_id|[Team](#schemateam)|true|none|团队|none|
+|manager_id|[Manager](#schemamanager)|true|none|团队管理员|none|
+|status|boolean|true|none|加入/退出状态|none|
+
+<h2 id="tocS_StuApplyProject">StuApplyProject</h2>
+
+<a id="schemastuapplyproject"></a>
+<a id="schema_StuApplyProject"></a>
+<a id="tocSstuapplyproject"></a>
+<a id="tocsstuapplyproject"></a>
+
+```json
+{
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  },
+  "student_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "real_name": "string",
+    "phone_id": "string",
+    "id_number": "string",
+    "wx_id": "string",
+    "faculty_id": "string",
+    "image_id": "string"
+  },
+  "status": true
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+|student_id|[Student](#schemastudent)|true|none|学生|none|
+|status|boolean|true|none|加入/退出状态|none|
+
+<h2 id="tocS_StuApplyTeam">StuApplyTeam</h2>
+
+<a id="schemastuapplyteam"></a>
+<a id="schema_StuApplyTeam"></a>
+<a id="tocSstuapplyteam"></a>
+<a id="tocsstuapplyteam"></a>
+
+```json
+{
+  "team_id": {
+    "ID": "string",
+    "name": "string",
+    "profile": "string",
+    "submit_time": "string",
+    "image_id": "string",
+    "isCheck": true
+  },
+  "student_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "real_name": "string",
+    "phone_id": "string",
+    "id_number": "string",
+    "wx_id": "string",
+    "faculty_id": "string",
+    "image_id": "string"
+  },
+  "status": true
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|team_id|[Team](#schemateam)|true|none|团队|none|
+|student_id|[Student](#schemastudent)|true|none|学生|none|
+|status|boolean|true|none|加入/退出状态|none|
+
+<h2 id="tocS_TeamProject">TeamProject</h2>
+
+<a id="schemateamproject"></a>
+<a id="schema_TeamProject"></a>
+<a id="tocSteamproject"></a>
+<a id="tocsteamproject"></a>
+
+```json
+{
+  "team_id": {
+    "ID": "string",
+    "name": "string",
+    "profile": "string",
+    "submit_time": "string",
+    "image_id": "string",
+    "isCheck": true
+  },
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|team_id|[Team](#schemateam)|true|none|团队|none|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+
+<h2 id="tocS_TeamManager">TeamManager</h2>
+
+<a id="schemateammanager"></a>
+<a id="schema_TeamManager"></a>
+<a id="tocSteammanager"></a>
+<a id="tocsteammanager"></a>
+
+```json
+{
+  "team_id": {
+    "ID": "string",
+    "name": "string",
+    "profile": "string",
+    "submit_time": "string",
+    "image_id": "string",
+    "isCheck": true
+  },
+  "manager_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "image_id": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|team_id|[Team](#schemateam)|true|none|团队|none|
+|manager_id|[Manager](#schemamanager)|true|none|团队管理员|none|
+
+<h2 id="tocS_TeamStudent">TeamStudent</h2>
+
+<a id="schemateamstudent"></a>
+<a id="schema_TeamStudent"></a>
+<a id="tocSteamstudent"></a>
+<a id="tocsteamstudent"></a>
+
+```json
+{
+  "team_id": {
+    "ID": "string",
+    "name": "string",
+    "profile": "string",
+    "submit_time": "string",
+    "image_id": "string",
+    "isCheck": true
+  },
+  "student_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "real_name": "string",
+    "phone_id": "string",
+    "id_number": "string",
+    "wx_id": "string",
+    "faculty_id": "string",
+    "image_id": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|team_id|[Team](#schemateam)|true|none|团队|none|
+|student_id|[Student](#schemastudent)|true|none|学生|none|
+
+<h2 id="tocS_FeedbackFile">FeedbackFile</h2>
+
+<a id="schemafeedbackfile"></a>
+<a id="schema_FeedbackFile"></a>
+<a id="tocSfeedbackfile"></a>
+<a id="tocsfeedbackfile"></a>
+
+```json
+{
+  "feedback_id": {
+    "ID": "string",
+    "profile": "string",
+    "student_id": {
+      "username": "string",
+      "password": "string",
+      "first_name": "string",
+      "real_name": "string",
+      "phone_id": "string",
+      "id_number": "string",
+      "wx_id": "string",
+      "faculty_id": "string",
+      "image_id": "string"
+    },
+    "project_id": {
+      "ID": "string",
+      "name": "string",
+      "time": "string",
+      "place": "string",
+      "profile": "string",
+      "state": true,
+      "quest_url": "string",
+      "private": true,
+      "isCheck": true
+    }
+  },
+  "file_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "post_time": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|feedback_id|[Feedback](#schemafeedback)|true|none|反馈|none|
+|file_id|[File](#schemafile)|true|none|文件|none|
+|post_time|string|true|none|发布时间|none|
+
+<h2 id="tocS_FeedbackImage">FeedbackImage</h2>
+
+<a id="schemafeedbackimage"></a>
+<a id="schema_FeedbackImage"></a>
+<a id="tocSfeedbackimage"></a>
+<a id="tocsfeedbackimage"></a>
+
+```json
+{
+  "feedback_id": {
+    "ID": "string",
+    "profile": "string",
+    "student_id": {
+      "username": "string",
+      "password": "string",
+      "first_name": "string",
+      "real_name": "string",
+      "phone_id": "string",
+      "id_number": "string",
+      "wx_id": "string",
+      "faculty_id": "string",
+      "image_id": "string"
+    },
+    "project_id": {
+      "ID": "string",
+      "name": "string",
+      "time": "string",
+      "place": "string",
+      "profile": "string",
+      "state": true,
+      "quest_url": "string",
+      "private": true,
+      "isCheck": true
+    }
+  },
+  "image_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "post_time": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|feedback_id|[Feedback](#schemafeedback)|false|none|反馈|none|
+|image_id|[Image](#schemaimage)|true|none|图片|none|
+|post_time|string|true|none|发布时间|none|
+
+<h2 id="tocS_Feedback">Feedback</h2>
+
+<a id="schemafeedback"></a>
+<a id="schema_Feedback"></a>
+<a id="tocSfeedback"></a>
+<a id="tocsfeedback"></a>
+
+```json
+{
+  "ID": "string",
+  "profile": "string",
+  "student_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string",
+    "real_name": "string",
+    "phone_id": "string",
+    "id_number": "string",
+    "wx_id": "string",
+    "faculty_id": "string",
+    "image_id": "string"
+  },
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|反馈id|none|
+|profile|string|true|none|反馈简介|none|
+|student_id|[Student](#schemastudent)|true|none|学生|none|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+
+<h2 id="tocS_FileMessage">FileMessage</h2>
+
+<a id="schemafilemessage"></a>
+<a id="schema_FileMessage"></a>
+<a id="tocSfilemessage"></a>
+<a id="tocsfilemessage"></a>
+
+```json
+{
+  "file_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "message_id": {
+    "ID": "string",
+    "post_time": "string",
+    "text": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|file_id|[File](#schemafile)|true|none|文件|none|
+|message_id|[Message](#schemamessage)|true|none|回复|none|
+
+<h2 id="tocS_FileNotice">FileNotice</h2>
+
+<a id="schemafilenotice"></a>
+<a id="schema_FileNotice"></a>
+<a id="tocSfilenotice"></a>
+<a id="tocsfilenotice"></a>
+
+```json
+{
+  "file_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "notice_id": {
+    "ID": "string",
+    "time": "string",
+    "type": "string",
+    "profile": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|file_id|[File](#schemafile)|true|none|文件|none|
+|notice_id|[Notice](#schemanotice)|true|none|消息|none|
+
+<h2 id="tocS_FileProject">FileProject</h2>
+
+<a id="schemafileproject"></a>
+<a id="schema_FileProject"></a>
+<a id="tocSfileproject"></a>
+<a id="tocsfileproject"></a>
+
+```json
+{
+  "file_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|file_id|[File](#schemafile)|true|none|文件|none|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+
+<h2 id="tocS_FileUser">FileUser</h2>
+
+<a id="schemafileuser"></a>
+<a id="schema_FileUser"></a>
+<a id="tocSfileuser"></a>
+<a id="tocsfileuser"></a>
+
+```json
+{
+  "file_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "user_id": {
+    "username": "string",
+    "password": "string",
+    "first_name": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|file_id|[File](#schemafile)|true|none|文件|none|
+|user_id|[User](#schemauser)|true|none|回复发送者|none|
+
+<h2 id="tocS_File">File</h2>
+
+<a id="schemafile"></a>
+<a id="schema_File"></a>
+<a id="tocSfile"></a>
+<a id="tocsfile"></a>
+
+```json
+{
+  "ID": "string",
+  "url": "string",
+  "post_time": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|文件id|none|
+|url|string|true|none|文件地址|none|
+|post_time|string|true|none|文件发布时间|none|
+
+<h2 id="tocS_ImageMessage">ImageMessage</h2>
+
+<a id="schemaimagemessage"></a>
+<a id="schema_ImageMessage"></a>
+<a id="tocSimagemessage"></a>
+<a id="tocsimagemessage"></a>
+
+```json
+{
+  "image_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "message_id": {
+    "ID": "string",
+    "post_time": "string",
+    "text": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|image_id|[Image](#schemaimage)|true|none|图片|none|
+|message_id|[Message](#schemamessage)|true|none|回复|none|
+
+<h2 id="tocS_ImageNotice">ImageNotice</h2>
+
+<a id="schemaimagenotice"></a>
+<a id="schema_ImageNotice"></a>
+<a id="tocSimagenotice"></a>
+<a id="tocsimagenotice"></a>
+
+```json
+{
+  "image_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "notice_id": {
+    "ID": "string",
+    "time": "string",
+    "type": "string",
+    "profile": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|image_id|[Image](#schemaimage)|true|none|图片|none|
+|notice_id|[Notice](#schemanotice)|true|none|消息|none|
+
+<h2 id="tocS_ImageProject">ImageProject</h2>
+
+<a id="schemaimageproject"></a>
+<a id="schema_ImageProject"></a>
+<a id="tocSimageproject"></a>
+<a id="tocsimageproject"></a>
+
+```json
+{
+  "image_id": {
+    "ID": "string",
+    "url": "string",
+    "post_time": "string"
+  },
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|image_id|[Image](#schemaimage)|false|none|图片|none|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+
+<h2 id="tocS_Image">Image</h2>
+
+<a id="schemaimage"></a>
+<a id="schema_Image"></a>
+<a id="tocSimage"></a>
+<a id="tocsimage"></a>
+
+```json
+{
+  "ID": "string",
+  "url": "string",
+  "post_time": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|图片id|none|
+|url|string|true|none|图片地址|none|
+|post_time|string|true|none|图片发布时间|none|
+
+<h2 id="tocS_DiscussionMessage">DiscussionMessage</h2>
+
+<a id="schemadiscussionmessage"></a>
+<a id="schema_DiscussionMessage"></a>
+<a id="tocSdiscussionmessage"></a>
+<a id="tocsdiscussionmessage"></a>
+
+```json
+{
+  "discussion_id": {
+    "ID": "string",
+    "type": "string",
+    "time": "string",
+    "title": "string",
+    "profile": "string",
+    "author": "string"
+  },
+  "message_id": {
+    "ID": "string",
+    "post_time": "string",
+    "text": "string"
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|discussion_id|[Discussion](#schemadiscussion)|true|none|讨论|none|
+|message_id|[Message](#schemamessage)|true|none|回复|none|
+
+<h2 id="tocS_Message">Message</h2>
+
+<a id="schemamessage"></a>
+<a id="schema_Message"></a>
+<a id="tocSmessage"></a>
+<a id="tocsmessage"></a>
+
+```json
+{
+  "ID": "string",
+  "post_time": "string",
+  "text": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|回复id|none|
+|post_time|string|true|none|回复发布时间|none|
+|text|string|true|none|回复内容|none|
+
+<h2 id="tocS_DiscussionProject">DiscussionProject</h2>
+
+<a id="schemadiscussionproject"></a>
+<a id="schema_DiscussionProject"></a>
+<a id="tocSdiscussionproject"></a>
+<a id="tocsdiscussionproject"></a>
+
+```json
+{
+  "discussion_id": {
+    "ID": "string",
+    "type": "string",
+    "time": "string",
+    "title": "string",
+    "profile": "string",
+    "author": "string"
+  },
+  "project_id": {
+    "ID": "string",
+    "name": "string",
+    "time": "string",
+    "place": "string",
+    "profile": "string",
+    "state": true,
+    "quest_url": "string",
+    "private": true,
+    "isCheck": true
+  }
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|discussion_id|[Discussion](#schemadiscussion)|true|none|讨论|none|
+|project_id|[Project](#schemaproject)|true|none|签到所属项目|none|
+
+<h2 id="tocS_Discussion">Discussion</h2>
+
+<a id="schemadiscussion"></a>
+<a id="schema_Discussion"></a>
+<a id="tocSdiscussion"></a>
+<a id="tocsdiscussion"></a>
+
+```json
+{
+  "ID": "string",
+  "type": "string",
+  "time": "string",
+  "title": "string",
+  "profile": "string",
+  "author": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|讨论id|none|
+|type|string|true|none|讨论类型|none|
+|time|string|true|none|发起讨论的时间|none|
+|title|string|true|none|讨论标题|none|
+|profile|string|true|none|讨论简介|none|
+|author|string|true|none|讨论发布者|none|
+
+<h2 id="tocS_Notice">Notice</h2>
+
+<a id="schemanotice"></a>
+<a id="schema_Notice"></a>
+<a id="tocSnotice"></a>
+<a id="tocsnotice"></a>
+
+```json
+{
+  "ID": "string",
+  "time": "string",
+  "type": "string",
+  "profile": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|通知id|none|
+|time|string|true|none|通知发布时间|none|
+|type|string|true|none|通知类型|none|
+|profile|string|true|none|通知内容简介|none|
+
+<h2 id="tocS_Team">Team</h2>
+
+<a id="schemateam"></a>
+<a id="schema_Team"></a>
+<a id="tocSteam"></a>
+<a id="tocsteam"></a>
+
+```json
+{
+  "ID": "string",
+  "name": "string",
+  "profile": "string",
+  "submit_time": "string",
+  "image_id": "string",
+  "isCheck": true
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|团队id|none|
+|name|string|true|none|团队姓名|none|
+|profile|string|true|none|团队简介|none|
+|submit_time|string|true|none|申请团队时间|none|
+|image_id|string|true|none|团队头像id|none|
+|isCheck|boolean|true|none|是否通过审核|none|
+
+<h2 id="tocS_Project">Project</h2>
+
+<a id="schemaproject"></a>
+<a id="schema_Project"></a>
+<a id="tocSproject"></a>
+<a id="tocsproject"></a>
+
+```json
+{
+  "ID": "string",
+  "name": "string",
+  "time": "string",
+  "place": "string",
+  "profile": "string",
+  "state": true,
+  "quest_url": "string",
+  "private": true,
+  "isCheck": true
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|ID|string|true|none|id|none|
+|name|string|true|none|项目名|none|
+|time|string|true|none|项目时间（开始-结束）|none|
+|place|string|true|none|项目地点|none|
+|profile|string|true|none|项目简介|none|
+|state|boolean|true|none|项目状态|none|
+|quest_url|string|true|none|问卷url|none|
+|private|boolean|true|none|是否团队私有|none|
+|isCheck|boolean|true|none|是否通过审核|none|
+
+<h2 id="tocS_Adminstrator">Adminstrator</h2>
+
+<a id="schemaadminstrator"></a>
+<a id="schema_Adminstrator"></a>
+<a id="tocSadminstrator"></a>
+<a id="tocsadminstrator"></a>
+
+```json
+{
+  "username": "string",
+  "password": "string",
+  "first_name": "string",
+  "image_id": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|username|string|true|none|学工号|none|
+|password|string|true|none|密码|none|
+|first_name|string|true|none|昵称|none|
+|image_id|string|true|none|头像id|none|
+
+<h2 id="tocS_Manager">Manager</h2>
+
+<a id="schemamanager"></a>
+<a id="schema_Manager"></a>
+<a id="tocSmanager"></a>
+<a id="tocsmanager"></a>
+
+```json
+{
+  "username": "string",
+  "password": "string",
+  "first_name": "string",
+  "image_id": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|username|string|true|none|学工号|none|
+|password|string|true|none|密码|none|
+|first_name|string|true|none|昵称|none|
+|image_id|string|true|none|头像id|none|
+
+<h2 id="tocS_Student">Student</h2>
+
+<a id="schemastudent"></a>
+<a id="schema_Student"></a>
+<a id="tocSstudent"></a>
+<a id="tocsstudent"></a>
+
+```json
+{
+  "username": "string",
+  "password": "string",
+  "first_name": "string",
+  "real_name": "string",
+  "phone_id": "string",
+  "id_number": "string",
+  "wx_id": "string",
+  "faculty_id": "string",
+  "image_id": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|username|string|true|none|用户名|none|
+|password|string|true|none|密码|none|
+|first_name|string|true|none|昵称|none|
+|real_name|string|true|none|真实姓名|none|
+|phone_id|string|true|none|电话号码|none|
+|id_number|string|true|none|身份证号|none|
+|wx_id|string|true|none|微信号|none|
+|faculty_id|string|true|none|学院号|none|
+|image_id|string|true|none|头像id|none|
+
+<h2 id="tocS_User">User</h2>
+
+<a id="schemauser"></a>
+<a id="schema_User"></a>
+<a id="tocSuser"></a>
+<a id="tocsuser"></a>
+
+```json
+{
+  "username": "string",
+  "password": "string",
+  "first_name": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|username|string|true|none|学工号|none|
+|password|string|true|none|密码|none|
+|first_name|string|true|none|昵称|none|
 
