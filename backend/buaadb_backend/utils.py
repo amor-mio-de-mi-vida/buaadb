@@ -17,6 +17,7 @@ def delete_file():
 
 
 def store_file(file, fn, type):
+    print(file)
     # 图片扩展名
     suffix = file.name.rsplit(".")[1]
     # 重新定义图片名

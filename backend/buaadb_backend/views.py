@@ -137,8 +137,10 @@ def get_personal_profile(request):
     elif role == "1":
         res_man = Manager.objects.get(username=res)
         res_image_id = res_man.image_id
-        image = Image.objects.get(ID=res_image_id)
-        res_image_url = image.url
+        res_image_url = ''
+        if res_image_id:
+            image = Image.objects.get(ID=res_image_id)
+            res_image_url = image.url
     else:
         res_admin = Adminstrator.objects.get(username=res)
         res_image_id = res_admin.image_id
@@ -523,10 +525,12 @@ def get_project(request):
         student = Student.objects.get(username=username)
         for project in projects:
             if project.private:
+                print("this project is private")
                 try:
                     team = TeamProject.objects.get(project_id=project).team_id
                     TeamStudent.objects.get(student_id=student, team_id=team)
                     image = ImageProject.objects.get(project_id=project).image_id
+                    print("success")
                     result.append({
                         "id": project.ID,
                         "name": project.name,
@@ -663,6 +667,10 @@ def delete_discussion(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
+    author_id = request.POST.get('author_id')
+    username = request.session.get('username')
+    if author_id != username:
+        return JsonResponse({"status": 401})
     discussion_id = request.POST.get('discussion_id')
     discussion = Discussion.objects.get(ID=discussion_id)
     discussion.delete()
@@ -718,19 +726,24 @@ def get_discussion(request):
     relations = DiscussionProject.objects.filter(project_id=project).all()
     for relation in relations:
         discussion = relation.discussion_id
+        url = ''
         if get_role(discussion.author.username) == 0:
             stu = Student.objects.get(username=discussion.author.username)
-            image = Image.objects.get(ID=stu.image_id)
+            if stu.image_id:
+                image = Image.objects.get(ID=stu.image_id)
+                url = image.url
         else:
             man = Manager.objects.get(username=discussion.author.username)
-            image = Image.objects.get(ID=man.image_id)
+            if man.image_id:
+                image = Image.objects.get(ID=man.image_id)
+                url = image.url
         discussions.append({
             "id": discussion.ID,
             "title": discussion.title,
             "time": discussion.time,
             "author_name": discussion.author.first_name,
             "author_id": discussion.author.username,
-            "author_url": image.url
+            "author_url": url
         })
     return JsonResponse({"status": 200, "discussions": discussions})
 
@@ -783,17 +796,19 @@ def pub_message(request):
     DiscussionMessage.objects.create(discussion_id=discussion, message_id=message)
     AMessageB.objects.create(sender_id=sender, receiver_id=receiver, message_id=message)
 
-    for image in images:
-        addr = store_file(image, fn, 0)
-        # 写数据库
-        img = Image.objects.create(url=addr, post_time=fn)
-        ImageMessage.objects.create(image_id=img, message_id=message)
+    if images:
+        for image in images:
+            addr = store_file(image, fn, 0)
+            # 写数据库
+            img = Image.objects.create(url=addr, post_time=fn)
+            ImageMessage.objects.create(image_id=img, message_id=message)
 
-    for file in files:
-        addr = store_file(file, fn, 1)
-        # 写数据库
-        file = File.objects.create(url=addr, post_time=fn)
-        FileMessage.objects.create(file_id=file, message_id=message)
+    if files:
+        for file in files:
+            addr = store_file(file, fn, 1)
+            # 写数据库
+            file = File.objects.create(url=addr, post_time=fn)
+            FileMessage.objects.create(file_id=file, message_id=message)
 
     return JsonResponse({"status": 200})
 
@@ -808,21 +823,36 @@ def get_discussion_replies(request):
     messages = []
     for relation in relations:
         message = relation.message_id
-        message_image = ImageMessage.objects.get(message_id=message).image_id
+        try:
+            message_image = ImageMessage.objects.get(message_id=message).image_id
+            message_url = message_image.url
+        except models.ObjectDoesNotExist:
+            message_url = ""
         amessageb = AMessageB.objects.get(message_id=relation.message_id)
         sender = amessageb.sender_id
-        from_image = ImageUser.objects.get(user_id=sender).image_id
+        if get_role(sender.username) == 0:
+            stu = Student.objects.get(username=sender.username)
+            from_url = ''
+            if stu.image_id:
+                sender_image = Image.objects.get(ID=stu.image_id)
+                from_url = sender_image.url
+        else:
+            man = Manager.objects.get(username=sender.username)
+            from_url = ''
+            if man.image_id:
+                sender_image = Image.objects.get(ID=man.image_id)
+                from_url = sender_image.url
         from_name = sender.first_name
         receiver = amessageb.receiver_id
         to_name = receiver.first_name
         messages.append({
             "id": relation.message_id.ID,
-            "message_url": message_image.url,
+            "message_url": message_url,
             "post_time": relation.message_id.post_time,
             "text": relation.message_id.text,
             "from_name": from_name,
             "from_id": sender.username,
-            "from_url": from_image.url,
+            "from_url": from_url,
             "to_name": to_name,
             "to_id": receiver.username,
             "visible": False
@@ -835,6 +865,10 @@ def delete_message(request):
     if request.method != "POST":
         return JsonResponse({"status": 500})  # 非POST请求
 
+    author_id = request.POST.get('author_id')
+    username = request.session.get('username')
+    if author_id != username:
+        return JsonResponse({"status": 401})
     id = request.POST.get('id')
     message = Message.objects.get(ID=id)
 
@@ -944,8 +978,8 @@ def get_out_team(request):
         relations = StuApplyTeam.objects.filter(status=True).all()
         for relation in relations:
             students.append({
-                "username": relation.student_id.username,
-                "name": relation.student_id.first_name,
+                "student_id": relation.student_id.username,
+                "student_name": relation.student_id.first_name,
                 "team_id": relation.team_id.ID,
                 "team_name": relation.team_id.name
             })
@@ -985,10 +1019,10 @@ def check_team_in(request):
         if result:
             StuApplyTeam.objects.get(student_id=student, team_id=team).delete()
             TeamStudent.objects.create(team_id=team, student_id=student)
-            profile = "success"
+            profile = "团队加入成功: " + team.name + "。"
             send_notice(fn, type, profile, sender_id, receiver_id)
         else:
-            profile = "fail:" + reason
+            profile = "团队加入失败: " + team.name + "。" + "(原因: " + reason + ")"
             send_notice(fn, type, profile, sender_id, receiver_id)
         return JsonResponse({"status": 200})
     elif role == "2":  # admin获取申请加入team的manager
@@ -1028,10 +1062,10 @@ def check_team_out(request):
         if result:
             StuApplyTeam.objects.get(student_id=student, team_id=team).delete()
             TeamStudent.objects.get(team_id=team, student_id=student).delete()
-            profile = "success"
+            profile = "团队退出成功: " + team.name + "。"
             send_notice(fn, type, profile, sender_id, receiver_id)
         else:
-            profile = "fail:" + reason
+            profile = "团队退出失败: " + team.name + "。" + "(原因: " + reason + ")"
             send_notice(fn, type, profile, sender_id, receiver_id)
         return JsonResponse({"status": 200})
     elif role == "2":  # admin获取申请加入team的manager
@@ -1060,6 +1094,9 @@ def apply_team_in(request):
 
     if role == "0":
         student = Student.objects.get(username=username)
+        count1 = TeamStudent.objects.filter(student_id=student, team_id=team).count()
+        if count1 != 0:
+            return JsonResponse({"status": 401})
         count = StuApplyTeam.objects.filter(student_id=student, team_id=team).count()
         if count == 0:
             StuApplyTeam.objects.create(student_id=student, team_id=team, status=False)
@@ -1147,6 +1184,9 @@ def stu_apply_project_in(request):
 
     student = Student.objects.get(username=username)
     count = StuApplyProject.objects.filter(student_id=student, project_id=project).count()
+    count1 = ProjectStudent.objects.filter(student_id=student, project_id=project).count()
+    if count1 != 0:
+        return JsonResponse({"status": 401})
     if count == 0:
         StuApplyProject.objects.create(student_id=student, project_id=project, status=False)
     return JsonResponse({"status": 200})
@@ -1314,7 +1354,11 @@ def man_create_project(request):
     manager_id = request.session.get('username')
     manager = Manager.objects.get(username=manager_id)
     team_id = request.POST.get('team_id')
-    private = request.POST.get('private')
+    is_private = request.POST.get('private')
+    if is_private == "0":
+        private = False
+    else:
+        private = True
     name = request.POST.get('name')
     time1 = request.POST.get('time')
     place = request.POST.get('place')
@@ -1322,8 +1366,9 @@ def man_create_project(request):
     state = request.POST.get('state')
     quest_url = request.POST.get('quest_url')
     tag = request.POST.get('tag')
-    images = request.FILES.get('images')
-    files = request.FILES.get('files')
+    image = request.FILES.get('image')
+    print(image)
+    # files = request.FILES.get('files')
     fn = time.strftime('%Y%m%d%H%M%S')
 
     project = Project.objects.create(name=name, time=time1, place=place, profile=profile, state=state,
@@ -1336,14 +1381,13 @@ def man_create_project(request):
 
     ProjectTag.objects.create(project_id=project, tag_name=tag)
 
-    if images:
-        for image in images:
-            image_id = store_file(image, fn, 0)
-            ImageProject.objects.create(image_id=image_id, project_id=project)
-    if files:
+    if image:
+        image_id = store_file(image, fn, 0)
+        ImageProject.objects.create(image_id=image_id, project_id=project)
+    '''if files:
         for file in files:
             file_id = store_file(file, fn, 0)
-            FileProject.objects.create(file_id=file_id, project_id=project)
+            FileProject.objects.create(file_id=file_id, project_id=project)'''
 
     return JsonResponse({"status": 200})
 
@@ -1494,7 +1538,8 @@ def admin_get_apply_project(request):
         result.append({
             "id": project.ID,
             "name": project.name,
-            "time": project.time
+            "time": project.time,
+            "place": project.place
         })
 
     return JsonResponse({"status": 200, "projects": result})
@@ -1702,10 +1747,13 @@ def search_project_tag(request):
     relations = ProjectTag.objects.filter(tag_name=tag_name).all()
     result = []
     for relation in relations:
+        project = relation.project_id
+        image = ImageProject.objects.get(project_id=project).image_id
         result.append({
             "id": relation.project_id.ID,
             "name": relation.project_id.name,
-            "time": relation.project_id.time
+            "time": relation.project_id.time,
+            "url": image.url
         })
 
     return JsonResponse({"status": 200, "projects": result})
