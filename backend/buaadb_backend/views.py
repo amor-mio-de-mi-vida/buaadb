@@ -1742,19 +1742,35 @@ def search_project_tag(request):
     if request.method != 'POST':
         return JsonResponse({"status": 500})
 
+    username = request.session.get("username")
+    student = Student.objects.get(username=username)
     tag_name = request.POST.get("tag")
     print(tag_name)
     relations = ProjectTag.objects.filter(tag_name=tag_name).all()
     result = []
     for relation in relations:
         project = relation.project_id
-        image = ImageProject.objects.get(project_id=project).image_id
-        result.append({
-            "id": relation.project_id.ID,
-            "name": relation.project_id.name,
-            "time": relation.project_id.time,
-            "url": image.url
-        })
+        if project.private:
+            try:
+                team = TeamProject.objects.get(project_id=project).team_id
+                TeamStudent.objects.get(student_id=student, team_id=team)
+                image = ImageProject.objects.get(project_id=project).image_id
+                result.append({
+                    "id": project.ID,
+                    "name": project.name,
+                    "time": project.time,
+                    "url": image.url
+                })
+            except models.ObjectDoesNotExist:
+                continue
+        else:
+            image = ImageProject.objects.get(project_id=project).image_id
+            result.append({
+                "id": project.ID,
+                "name": project.name,
+                "time": project.time,
+                "url": image.url
+            })
 
     return JsonResponse({"status": 200, "projects": result})
 
