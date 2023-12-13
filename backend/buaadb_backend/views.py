@@ -1,9 +1,11 @@
+import csv
 import time
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth import logout as dj_logout, login as dj_login
 
+from backend.settings import CSVFILE_DIR, CSVFILE_PATH
 from .utils import *
 
 
@@ -1755,3 +1757,57 @@ def search_project_tag(request):
         })
 
     return JsonResponse({"status": 200, "projects": result})
+
+def gen_stu_profile_form(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    project_id = request.POST.get('project_id')
+    project = Project.objects.get(ID=project_id)
+
+    relations = ProjectStudent.objects.filter(project_id=project).all()
+
+    data = [['学工号', '姓名', '学院号', '电话号', '身份证号', '微信号']]
+
+    for relation in relations:
+        student = relation.student_id
+        data.append([student.username, student.real_name, student.faculty_id, student.phone_id, student.id_number, student.wx_id])
+
+    fn = time.strftime('%Y%m%d%H%M%S')
+    file_name = fn + '_%d' % random.randint(0, 10000) + '.csv'
+
+    with open(CSVFILE_DIR + file_name, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(data)
+
+    url = CSVFILE_PATH + file_name
+    return JsonResponse({"status": 200, "form_url": url})
+
+def gen_sign_result_form(request):
+    if request.method != 'POST':
+        return JsonResponse({"status": 500})
+
+    sign_id = request.POST.get('sign_id')
+    sign = Sign.objects.get(ID=sign_id)
+
+    relations = StudentSign.objects.filter(sign=sign).all()
+
+    data = [['学工号', '姓名', '签到状态', '备注']]
+
+    for relation in relations:
+        student = relation.student
+        if relation.state == False:
+            status = '未签到'
+        else:
+            status = '已签到'
+        data.append([student.username, student.real_name, status, relation.message])
+
+    fn = time.strftime('%Y%m%d%H%M%S')
+    file_name = sign.name + '.csv'
+
+    with open(CSVFILE_DIR + file_name, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(data)
+
+    url = CSVFILE_PATH + file_name
+    return JsonResponse({"status": 200, "form_url": url})

@@ -154,12 +154,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # 资源存储路径
 IMAGE_DIR = "./images/"
 FILE_DIR = "./files/"
+CSVFILE_DIR = './csvfiles/'
 
 
 # 资源外部访问路径
 OUT_BASE_PATH = 'http://localhost:8082/'
 IMAGE_PATH = OUT_BASE_PATH + 'images/'
 FILE_PATH = OUT_BASE_PATH + 'files/'
+CSVFILE_PATH = OUT_BASE_PATH + 'csvfiles/'
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True

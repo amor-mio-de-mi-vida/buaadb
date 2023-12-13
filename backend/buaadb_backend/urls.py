@@ -66,5 +66,7 @@ urlpatterns = [
     path("man_modify_sign/", man_modify_sign), # 团体管理员修改某次签到的状态
     path("stu_get_signlist/", stu_get_signlist), # 学生获取某个项目的签到列表
     path("stu_signin/", stu_signin), # 学生签到
-    path("search_project_tag/", search_project_tag)
+    path("search_project_tag/", search_project_tag), # 按照指定标签搜索项目
+    path("gen_stu_profile_form/", gen_stu_profile_form),
+    path("gen_sign_result_form/", gen_sign_result_form)
 ]
